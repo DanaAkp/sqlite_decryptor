@@ -2,58 +2,58 @@
 
 {% block body %}
 
-    <p>
-        <input type="file" id="file-db">
-        <input type="text" placeholder="Пароль для расшифрования файла БД">
-        <input type="button" onclick="upload_encrypted_file_db()" value="Загрузить зашифрованный файл БД">
-    </p>
+<p>
+    <input type="file" id="file-db">
+    <input type="text" placeholder="Пароль для расшифрования файла БД">
+    <input type="button" onclick="upload_encrypted_file_db()" value="Загрузить зашифрованный файл БД">
+</p>
 
-    <input type="button" onclick="save_encrypted_file_db()" value="Сохранить зашифрованный файл БД">
-    <input type="button" onclick="clear_current_file_db()" value="Очистить текущий файл БД">
-    <input type="button" onclick="encrypt_file_db()" value="Зашифровать файл БД">
+<input type="button" onclick="save_encrypted_file_db()" value="Сохранить зашифрованный файл БД">
+<input type="button" onclick="clear_current_file_db()" value="Очистить текущий файл БД">
+<input type="button" onclick="encrypt_file_db()" value="Зашифровать файл БД">
 
-    <script>
-        let input = document.getElementById('file-db');
-        input.onchange = e => {
+<script>
+    let input = document.getElementById('file-db');
+    input.onchange = e => {
 
-            // getting a hold of the file reference
-            var file = e.target.files[0];
+        // getting a hold of the file reference
+        var file = e.target.files[0];
 
-            // setting up the reader
-            var reader = new FileReader();
-            reader.readAsArrayBuffer(file);
+        // setting up the reader
+        var reader = new FileReader();
+        reader.readAsArrayBuffer(file);
 
-            // here we tell the reader what to do when it's done reading...
-            reader.onload = readerEvent => {
-                var content = readerEvent.target.result; // this is the content!
-                console.log(toHexString(content));
-            }
-
+        // here we tell the reader what to do when it's done reading...
+        reader.onload = readerEvent => {
+            let content = readerEvent.target.result; // this is the content!
+            let arr = new Uint8Array(content)
+            let hex = toHexString(arr);
+            console.log(hex);
         }
 
-        function toHexString(byteArray) {
-            return Array.from(byteArray, function (byte) {
-                return ('0' + (byte & 0xFF).toString(16)).slice(-2);
-            }).join('')
-        }
+    }
+    function toHexString(byteArray) {
+        return Array.prototype.map.call(byteArray, function (byte) {
+            return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+        }).join('');
+    }
 
+    function upload_encrypted_file_db() {
+        let file_db = document.getElementById('file-db');
+        console.log(file_db)
+    }
 
-        function upload_encrypted_file_db() {
-            let file_db = document.getElementById('file-db');
-            console.log(file_db)
-        }
+    function save_encrypted_file_db() {
 
-        function save_encrypted_file_db() {
+    }
 
-        }
+    function clear_current_file_db() {
 
-        function clear_current_file_db() {
+    }
 
-        }
+    function encrypt_file_db() {
 
-        function encrypt_file_db() {
-
-        }
-    </script>
+    }
+</script>
 
 {% endblock %}
