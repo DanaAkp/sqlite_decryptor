@@ -1,6 +1,4 @@
 from flask import jsonify, request, abort
-from flask_login import login_required
-
 from app.app import app, admin, database_information
 
 
@@ -30,7 +28,6 @@ def check_body_request():
 
 
 @app.route('/sqlite_decrypter/api/save_encrypted_db_file', methods=['GET'])
-@login_required
 def save_encrypted_db_file():
     """Возвращает зашифрованную копию текущей активной базы данных."""
     check_body_request()
