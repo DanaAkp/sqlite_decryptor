@@ -15,7 +15,5 @@ class Config(object):
 
 
 class DevelopmentConfig(Config):
-    SQLALCHEMY_DATABASE_URI = "sqlite:///%s/develop.db" % Config.DATA_PATH
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    # EXPLAIN_TEMPLATE_LOADING = True
-    DEBUG = True
+    DEBUG = False
