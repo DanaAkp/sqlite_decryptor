@@ -45,9 +45,9 @@ def upload_encrypted_db_file():
     """Загружает и расшифровывает файл базы данных для дальнейшей работы с ней."""
     check_body_request(['database_file', 'password'])
     # TODO проверять пароль
-    # TODO расшифровать request.json['file_database']
+    # TODO расшифровать request.json['database_file']
 
-    database_information.session = (bytes.fromhex(request.json['file_database']), request.json['password'])
+    database_information.session = (bytes.fromhex(request.json['database_file']), request.json['password'])
     for entity in database_information.classes:
         admin.add_view(ModelView(entity, database_information.session))
     return jsonify({'result': True})
