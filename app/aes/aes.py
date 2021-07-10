@@ -2,7 +2,8 @@ import os
 
 from hashlib import pbkdf2_hmac
 from hmac import new as new_hmac, compare_digest
-from AES.config import AES_KEY_SIZE, HMAC_KEY_SIZE, HMAC_SIZE, IV_SIZE, SALT_SIZE
+from app.aes.aes_config import AES_KEY_SIZE, HMAC_KEY_SIZE, HMAC_SIZE, IV_SIZE, SALT_SIZE
+
 
 s_box = (
     0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
@@ -51,14 +52,14 @@ r_con = (
 
 
 class AES:
-    def __init__(self):
-        key = b'1234567890123456'  # TODO input key
-        self._round_by_key_size = {16: 10, 24: 10, 32: 14}
+    def __init__(self, key):
+        self.key = key
+        self._round_by_key_size = {16: 10,24: 10, 32: 14}
         if len(key) not in self._round_by_key_size:
             raise Exception('Invalid key size!')
 
         self.n_rounds = self._round_by_key_size[len(key)]
-        self._key_matrix = self._expand_key(key)
+        self._key_matrix = self._expand_key()
 
         self.xtime = lambda a: (((a << 1) ^ 0x1B) & 0xFF) if (a & 0x80) else (a << 1)
 
@@ -112,7 +113,8 @@ class AES:
 
         self.mix_columns(s)
 
-    def _expand_key(self, key):
+    def _expand_key(self):
+        key = self.key
         """
         Expands and returns a list of key matrices for the given master_key.
         """
@@ -160,7 +162,7 @@ class AES:
         """ Converts a 4x4 matrix into a 16-byte array.  """
         return bytes(sum(matrix, []))
 
-    def encrypt_cbc(self, key, plaintext, iv):
+    def encrypt_cbc(self, plaintext, iv):
         assert len(iv) == 16
 
         plaintext = self.pad(plaintext)
@@ -260,7 +262,7 @@ class AES:
         assert all(p == padding_len for p in padding)
         return message
 
-    def get_key_iv(self, password, salt, workload=100000):
+    def get_key_iv(self, password, salt, workload = 100000):
         """
         Stretches the password and extracts an AES key, an HMAC key and an AES
         initialization vector.
@@ -272,7 +274,7 @@ class AES:
         return aes_key, hmac_key, iv
 
     def encrypt(self, plaintext):
-        key = b'1234567890123456'
+        key = self.key
         workload = 100000
         if isinstance(key, str):
             key = key.encode('utf-8')
@@ -281,14 +283,14 @@ class AES:
 
         salt = os.urandom(SALT_SIZE)
         key, hmac_key, iv = self.get_key_iv(key, salt, workload)
-        ciphertext = self.encrypt_cbc(key, plaintext, iv)
+        ciphertext = self.encrypt_cbc(plaintext, iv)
         hmac = new_hmac(hmac_key, salt + ciphertext, 'sha256').digest()
         assert len(hmac) == HMAC_SIZE
 
         return hmac + salt + ciphertext
 
     def decrypt(self, ciphertext, workload=100000):
-        key = b'1234567890123456'
+        key = self.key
         """
         Decrypts `ciphertext` with `key` using AES-128, an HMAC to verify integrity,
         and PBKDF2 to stretch the given key.
@@ -314,3 +316,4 @@ class AES:
         assert compare_digest(hmac, expected_hmac), 'Ciphertext corrupted or tampered.'
 
         return self.decrypt_cbc(ciphertext, iv)
+

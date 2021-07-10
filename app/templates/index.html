@@ -3,56 +3,107 @@
 {% block body %}
 
     <p>
-        <input type="file" id="file-db">
-        <input type="text" id="password" placeholder="Пароль для расшифрования файла БД">
+        <input type="file" id="encrypted-file-db">
+        <input type="text" id="password-for-decrypt-file" placeholder="Пароль для дешифрования файла БД">
         <input type="button" id="button-upload" value="Загрузить зашифрованный файл БД">
     </p>
+    <br>
     <p>
-        <input type="button" onclick="save_encrypted_db_file()" value="Сохранить зашифрованный файл БД">
+        <input type="button" id="button-save" onclick="save_encrypted_db_file()"
+               value="Сохранить зашифрованный файл БД">
     </p>
+    <br>
     <p>
-        <input type="button" onclick="clear_current_db_file()" value="Очистить текущий файл БД">
+        <input type="button" id="button-clear" onclick="clear_current_db_file()" value="Очистить текущий файл БД">
     </p>
+    <br>
     <p>
-        <input type="button" onclick="encrypt_db_file()" value="Зашифровать файл БД">
+        <input type="file" id="unencrypted-database-file">
+        <input type="text" id="password-for-encrypt-file" placeholder="Пароль для шифрования файла БД">
+        <input type="button" id="button-encrypt" value="Зашифровать файл БД">
     </p>
     <script>
-        let input = document.getElementById('file-db');
-        input.onchange = e => {
+        let input_encrypted_file_db = document.getElementById('encrypted-file-db');
+        let password_for_decrypt = document.getElementById('password-for-decrypt-file');
+        input_encrypted_file_db.onchange = e => {
             document.getElementById('button-upload').onclick = () => {
-
-                // getting a hold of the file reference
                 let file = e.target.files[0];
-
-                // setting up the reader
                 let reader = new FileReader();
-                reader.readAsArrayBuffer(file);
-
-                // here we tell the reader what to do when it's done reading...
+                reader.readAsText(file);
                 reader.onload = reader_event => {
-                    let content = reader_event.target.result; // this is the content!
-                    let arr = new Uint8Array(content);
-                    let hex = to_hex_string(arr);
-                    let password = document.getElementById('password');
+                    let content = reader_event.target.result;
                     const request = new XMLHttpRequest();
                     request.open('POST', '/sqlite_decrypter/api/upload_encrypted_db_file', true);
                     request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-                    request.send(JSON.stringify({
-                        database_file: hex,
-                        password: password.value
-                    }));
+                    let  json = JSON.stringify({
+                        database_file: content,
+                        password: password_for_decrypt.value
+                    });
+                    console.log(password_for_decrypt.value);
+                    console.log(json);
+                    request.send(json);
                     request.onreadystatechange = function () {
                         if (request.readyState === 4) {
-                            if (JSON.parse(request.response).result === true) {
+                            let response = JSON.parse(request.response);
+                            if (response.result === true) {
                                 window.location.reload();
-                                password.value =  '';
-                                input.value = '';
-                            }
+                                password_for_decrypt.value = '';
+                                input_encrypted_file_db.value = '';
+                            } else alert(response.message);
                         }
                     }
                 }
             }
         }
+
+        let input_decrypt_file_db = document.getElementById('unencrypted-database-file')
+        let password_for_encrypt = document.getElementById('password-for-encrypt-file')
+        input_decrypt_file_db.onchange = e => {
+            document.getElementById('button-encrypt').onclick = () => {
+                let file = e.target.files[0];
+                let reader = new FileReader();
+                reader.readAsArrayBuffer(file);
+                reader.onload = reader_event => {
+                    let content = reader_event.target.result;
+                    let arr = new Uint8Array(content);
+                    let hex = to_hex_string(arr);
+                    const request = new XMLHttpRequest();
+                    request.open('PUT', '/sqlite_decrypter/api/encrypt_db_file', true);
+                    request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+                    request.send(JSON.stringify({
+                        'database_file': hex,
+                        'password': password_for_encrypt.value
+                    }));
+
+                    request.onreadystatechange = function () {
+                        if (request.readyState === 4) {
+                            let response = JSON.parse(request.response);
+                            if (response.message === undefined) {
+                                let textData = JSON.parse(request.response).encrypted_file;
+                                let blobData = new Blob([textData], {type: "text/plain"});
+                                let url = window.URL.createObjectURL(blobData);
+                                save_file('example.txt', url);
+
+                                password_for_encrypt.value = '';
+                                input_decrypt_file_db.value = '';
+                            } else alert(response.message);
+                        }
+                    }
+                }
+            }
+        }
+
+        function save_file(file_name, url_file) {
+            let a = document.createElement("a");
+            a.style = "display: none";
+            document.body.appendChild(a);
+            a.href = url_file;
+            a.download = file_name;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+        }
+
 
         function to_hex_string(byte_array) {
             return Array.prototype.map.call(byte_array, function (byte) {
@@ -69,7 +120,7 @@
             const request = new XMLHttpRequest();
             request.open('DELETE', '/sqlite_decrypter/api/clear_current_db_file', false);
             request.send();
-            if (request.status === 200){
+            if (request.status === 200) {
                 window.location.reload();
                 alert('The current database file has been cleaned up successfully.')
             }
