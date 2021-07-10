@@ -61,9 +61,9 @@ def check_body_request(fields):
 @app.route('/sqlite_decrypter/api/save_encrypted_db_file', methods=['GET'])
 def save_encrypted_db_file():
     """Возвращает зашифрованную копию текущей активной базы данных."""
-    aes = AES(database_information._password)
+    aes = AES(database_information._password.encode('utf-8'))
     encrypted_db = aes.encrypt(database_information.database_file)
-    return jsonify({})  # TODO вернуть зишифрованный файл
+    return jsonify({'encrypted_file': encrypted_db.hex()})
 
 
 @app.route('/sqlite_decrypter/api/upload_encrypted_db_file', methods=['POST'])
@@ -77,7 +77,7 @@ def upload_encrypted_db_file():
         database_information.session = (decrypted_file, request.json['password'])
         return jsonify({'result': True})
     except Exception as ex:
-        abort(400, ex.args[0])
+        abort(400, ex.args[0])  # TODO другой номер
 
 
 @app.route('/sqlite_decrypter/api/clear_current_db_file', methods=['DELETE'])

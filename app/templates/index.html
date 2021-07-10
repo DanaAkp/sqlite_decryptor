@@ -35,7 +35,7 @@
                     const request = new XMLHttpRequest();
                     request.open('POST', '/sqlite_decrypter/api/upload_encrypted_db_file', true);
                     request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-                    let  json = JSON.stringify({
+                    let json = JSON.stringify({
                         database_file: content,
                         password: password_for_decrypt.value
                     });
@@ -113,8 +113,16 @@
 
 
         function save_encrypted_db_file() {
+            const request = new XMLHttpRequest();
+            request.open('GET', '/sqlite_decrypter/api/save_encrypted_db_file', false);
+            request.send();
 
+            let textData = JSON.parse(request.response).encrypted_file;
+            let blobData = new Blob([textData], {type: "text/plain"});
+            let url = window.URL.createObjectURL(blobData);
+            save_file('example.txt', url);
         }
+
 
         function clear_current_db_file() {
             const request = new XMLHttpRequest();
