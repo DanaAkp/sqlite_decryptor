@@ -13,16 +13,16 @@ app.static_folder = app.config['STATIC_FOLDER']
 database_information = DatabaseInformation()
 
 
-class AdminView(AdminIndexView):
-    def is_visible(self):
-        return False
+# class AdminView(AdminIndexView):
+#     def is_visible(self):
+#         return False
+#
+#     @expose('/')
+#     def index(self):
+#         return self.render('index.html')
 
-    @expose('/')
-    def index(self):
-        return self.render('index.html')
 
-
-admin = Admin(app, url='/test', template_mode='bootstrap3', index_view=AdminView(url='/test'), name='My app')
+# admin = Admin(app, url='/test', template_mode='bootstrap3', index_view=AdminView(url='/test'), name='My app')
 from app.api import *
-
+from app.views import *
 

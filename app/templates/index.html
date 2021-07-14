@@ -22,6 +22,10 @@
         <input type="text" id="password-for-encrypt-file" placeholder="Пароль для шифрования файла БД">
         <input type="button" id="button-encrypt" value="Зашифровать файл БД">
     </p>
+    <br>
+    <p>
+    <ul id="entity-list"></ul>
+    </p>
     <script>
         let input_encrypted_file_db = document.getElementById('encrypted-file-db');
         let password_for_decrypt = document.getElementById('password-for-decrypt-file');
@@ -46,16 +50,30 @@
                         if (request.readyState === 4) {
                             let response = JSON.parse(request.response);
                             if (response.result === true) {
-                                window.location.reload();
-                                password_for_decrypt.value = '';
-                                input_encrypted_file_db.value = '';
+                                fill_entity_list();
+                                password_for_decrypt.value = '1234567890123456';
+                                {#input_encrypted_file_db.value = '';#}
                             } else alert(response.message);
                         }
                     }
                 }
             }
         }
-
+        function fill_entity_list() {
+            const request = new XMLHttpRequest();
+            request.open('GET', '/models', false);
+            request.send();
+            let entity_list = document.getElementById('entity-list');
+            let json = JSON.parse(request.response).json_list;
+            for (let i in json){
+                let list_item = document.createElement('li');
+                let a = document.createElement('a');
+                a.href = `/sqlite_decrypter/${json[i]}`;
+                a.textContent = json[i];
+                list_item.appendChild(a);
+                entity_list.appendChild(list_item);
+            }
+        }
         let input_decrypt_file_db = document.getElementById('unencrypted-database-file')
         let password_for_encrypt = document.getElementById('password-for-encrypt-file')
         input_decrypt_file_db.onchange = e => {
@@ -84,8 +102,8 @@
                                 let url = window.URL.createObjectURL(blobData);
                                 save_file('example.txt', url);
 
-                                password_for_encrypt.value = '';
-                                input_decrypt_file_db.value = '';
+                                password_for_encrypt.value = '1234567890123456';
+                                {#input_decrypt_file_db.value = '';#}
                             } else alert(response.message);
                         }
                     }
@@ -134,9 +152,6 @@
             }
         }
 
-        function encrypt_db_file() {
-
-        }
     </script>
 
 {% endblock %}

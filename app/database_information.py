@@ -38,13 +38,8 @@ class DatabaseInformation:
 
     def get_entity_information(self, entity_name: str):
         """Возвращает набор полей данной сущнос"""
-        buf = ['__abstract__', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__',
-               '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__',
-               '__mapper__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__',
-               '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__table__', '__weakref__',
-               '_sa_class_manager', '_sa_decl_prepare', '_sa_raise_deferred_config', '_sa_registry',
-               'classes', 'metadata', 'prepare', 'registry']
-        return set(dir(self.classes[entity_name])) - set(buf)
+        columns = list(map(lambda x: x, self.classes[entity_name].__dict__['__table__'].columns))
+        return list(map(lambda x: x.name, columns))
 
     def clear(self):
         self._session = None
