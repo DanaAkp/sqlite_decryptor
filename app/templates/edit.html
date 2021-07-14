@@ -1,10 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+
+{% block page_content %}
 <h1>Edit {{ entity_name }}</h1>
 <div id="input-attributes"></div>
 <p>
@@ -61,5 +58,4 @@
         }
     }
 </script>
-</body>
-</html>
+{% endblock %}

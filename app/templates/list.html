@@ -1,10 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+
+{% block page_content %}
 <h1>{{ entity_name }}</h1>
 <table id="table-entity"></table>
 <input type="button" value="Add new" onclick="create_function()">
@@ -95,4 +92,4 @@
         window.location.href = `/sqlite_decrypter/create/${entity_name}`;
     }
 </script>
-</body>
+{% endblock %}

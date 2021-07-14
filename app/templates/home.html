@@ -1,11 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
+
+{% block page_content %}
 <p>
     <input type="file" id="encrypted-file-db">
     <input type="text" id="password-for-decrypt-file" placeholder="Пароль для дешифрования файла БД">
@@ -162,5 +158,4 @@
     }
 
 </script>
-</body>
-</html>
+{% endblock %}

@@ -28,7 +28,9 @@ def serializer(object_to_serialize, attributes):
 
 @app.route('/models', methods=['GET'])
 def get_entity_list():
-    """Возвращает список суущностей базы данных."""
+    """Возвращает список сущностей базы данных."""
+    if database_information.classes is None:
+        abort(500, 'Database file does not uploaded yet.')
     entities = database_information.classes.keys()
     return jsonify(json_list=entities)
 
