@@ -2,9 +2,31 @@
 
 
 {% block page_content %}
+    <style>
+        .button_delete {
+            width: 30px;
+            height: 30px;
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4Igp3aWR0aD0iNjQiIGhlaWdodD0iNjQiCnZpZXdCb3g9IjAgMCAxNzIgMTcyIgpzdHlsZT0iIGZpbGw6IzAwMDAwMDsiPjxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0ibm9uemVybyIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIHN0cm9rZS1kYXNoYXJyYXk9IiIgc3Ryb2tlLWRhc2hvZmZzZXQ9IjAiIGZvbnQtZmFtaWx5PSJub25lIiBmb250LXdlaWdodD0ibm9uZSIgZm9udC1zaXplPSJub25lIiB0ZXh0LWFuY2hvcj0ibm9uZSIgc3R5bGU9Im1peC1ibGVuZC1tb2RlOiBub3JtYWwiPjxwYXRoIGQ9Ik0wLDE3MnYtMTcyaDE3MnYxNzJ6IiBmaWxsPSJub25lIj48L3BhdGg+PGcgZmlsbD0iIzMzMzMzMyI+PHBhdGggZD0iTTc1LjI1LDE2LjEyNWMtNS45MzY2OSwwIC0xMC43NSw0LjgxMzMxIC0xMC43NSwxMC43NXY1LjM3NWgtMS4wNzYwNWwtMzYuNTQ4OTUsNS4zNzV2OC4wNjI1aDExOC4yNXYtOC4wNjI1bC0zNi41NDg5NSwtNS4zNzVoLTEuMDc2MDV2LTUuMzc1YzAsLTUuOTM2NjkgLTQuODEzMzEsLTEwLjc1IC0xMC43NSwtMTAuNzV6TTc1LjI1LDI2Ljg3NWgyMS41djUuMzc1aC0yMS41ek0zMi4yNSw1MS4wNjI1bDcuMjU5NCw4OS41NTM1OWMwLjQ1MTUsNS41ODE5NCA1LjExNzc2LDkuODgzOTEgMTAuNzE4NTEsOS44ODM5MWg3MS41NDk0NGM1LjYwMDc1LDAgMTAuMjU5MDcsLTQuMjk2NzIgMTAuNzEzMjYsLTkuODc4NjZsNy4wNTQ2OSwtODYuODcxMzR6TTUzLjc1LDY5Ljg3NWMyLjk2OTY5LDAgNS4zNzUsMi40MDUzMSA1LjM3NSw1LjM3NXY2MS44MTI1aC04LjA2MjVsLTIuNjg3NSwtNjEuODEyNWMwLC0yLjk2OTY5IDIuNDA1MzEsLTUuMzc1IDUuMzc1LC01LjM3NXpNODYsNjkuODc1YzQuNDUzMTksMCA4LjA2MjUsMy42MDkzMSA4LjA2MjUsOC4wNjI1djU5LjEyNWgtMTYuMTI1di01OS4xMjVjMCwtNC40NTMxOSAzLjYwOTMxLC04LjA2MjUgOC4wNjI1LC04LjA2MjV6TTExOC4yNSw2OS44NzVjMi45Njk2OSwwIDUuMzc1LDIuNDA1MzEgNS4zNzUsNS4zNzVsLTIuNjg3NSw2MS44MTI1aC04LjA2MjV2LTYxLjgxMjVjMCwtMi45Njk2OSAyLjQwNTMxLC01LjM3NSA1LjM3NSwtNS4zNzV6Ij48L3BhdGg+PC9nPjwvZz48L3N2Zz4=');
+        }
+        .button_edit {
+            width: 30px;
+            height: 30px;
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-image: url('https://img.icons8.com/glyph-neue/64/000000/edit.png');
+        }
+    </style>
     <h1>{{ entity_name }}</h1>
     <table id="table-entity" class="table"></table>
-    <input type="button" value="Add new" onclick="create_function()">
+    <input type="button" onclick="create_function()"
+    style="background-image:
+    url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/wD/AP+gvaeTAAAAkElEQVRoge3YQQqAMAxE0eixpJ5ePZcu3IjYNkLIQPkPupOmsygONQOAkRxmdnbWFjlwitzM7gOmzp2jNlIhgBoB1AigRgA1AjysP74tgXOrPMUsa1ULYKtUeYtZls+zcgfUCKBGALWhA+xpp+gLfcmoKeb/sy5RQ3lWUSOAGgHUCKBGADUCvHgKYEoxA4AcF/q+PhlpvdipAAAAAElFTkSuQmCC');
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 30px;
+    width: 30px;">
     <script>
         let entity_name = '{{ entity_name }}';
         create_table();
@@ -38,13 +60,17 @@
                     td.textContent = json[i][j];
                     row.appendChild(td);
                 }
-                let id = json[i]['id'];
+                const request_primary_key = new XMLHttpRequest();
+                request_primary_key.open('GET', `/models/primary_key/${entity_name}`, false);
+                request_primary_key.send();
+
+                let id = json[i][JSON.parse(request_primary_key.response).primary_key];
                 console.log(id);
 
                 let column_edit = document.createElement('td');
                 let input_edit = document.createElement('input');
                 input_edit.type = 'button';
-                input_edit.value = 'Edit';
+                input_edit.className = 'button_edit';
                 let edit = edit_function(id);
                 input_edit.onclick = function () {
                     edit()
@@ -54,8 +80,8 @@
 
                 let column_delete = document.createElement('td');
                 let input_delete = document.createElement('input');
-                input_delete.value = 'Delete';
                 input_delete.type = 'button';
+                input_delete.className = 'button_delete';
                 let del = delete_function(id);
                 input_delete.onclick = function () {
                     del()

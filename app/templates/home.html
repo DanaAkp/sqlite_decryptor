@@ -67,6 +67,7 @@
             request.send();
             if (request.status === 200) {
                 let entity_list = document.getElementById('list_entity');
+                entity_list.innerText = '';
                 let json = JSON.parse(request.response).json_list;
                 for (let i in json) {
                     let u_list = document.createElement('ul');

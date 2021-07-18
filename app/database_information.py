@@ -39,7 +39,13 @@ class DatabaseInformation:
     def get_entity_information(self, entity_name: str):
         """Возвращает набор полей данной сущнос"""
         columns = list(map(lambda x: x, self.classes[entity_name].__dict__['__table__'].columns))
-        return list(map(lambda x: x.name, columns))
+        return sorted(list(map(lambda x: x.name, columns)))
+
+    def get_primary_key(self, entity_name:str):
+        columns = self.classes[entity_name].__dict__['__table__'].columns
+        for i in columns:
+            if i.primary_key:
+                return i
 
     def clear(self):
         self._session = None

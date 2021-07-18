@@ -18,6 +18,6 @@ def page(entity_name):
     return render_template('create.html', entity_name=entity_name)
 
 
-@app.route('/sqlite_decrypter/edit/<string:entity_name>/<int:entity_id>')
+@app.route('/sqlite_decrypter/edit/<string:entity_name>/<entity_id>')
 def page_edit(entity_name, entity_id):
     return render_template('edit.html', entity_name=entity_name, entity_id=entity_id)

@@ -42,6 +42,12 @@ def get_entity(entity_name):
     return jsonify(json_list=attributes)
 
 
+@app.route('/models/primary_key/<string:entity_name>', methods=['GET'])
+def get_primary_key(entity_name):
+    """Возвращает название ключевого поля."""
+    return jsonify({'primary_key': database_information.get_primary_key(entity_name).name})
+
+
 @app.route('/models/<string:entity_name>', methods=['GET'])
 def get_records(entity_name):
     """Возвращает список записей для данной сущности. """
@@ -52,10 +58,11 @@ def get_records(entity_name):
     return jsonify(json_list=buf)
 
 
-@app.route('/models/<string:entity_name>/<int:entity_id>', methods=['GET'])
+@app.route('/models/<string:entity_name>/<entity_id>', methods=['GET'])
 def get_object(entity_name, entity_id):
     entity = database_information.classes[entity_name]
-    object_ = database_information.session.query(entity).filter_by(id=entity_id).first()
+    primary_key = database_information.get_primary_key(entity_name)
+    object_ = database_information.session.query(entity).filter(primary_key==entity_id).first()
     return jsonify(serializer(object_, database_information.get_entity_information(entity_name)))
 
 
