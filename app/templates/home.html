@@ -29,7 +29,6 @@
     <script>
         let input_encrypted_file_db = document.getElementById('encrypted-file-db');
         let password_for_decrypt = document.getElementById('password-for-decrypt-file');
-        fill_entity_list()
         input_encrypted_file_db.onchange = e => {
             document.getElementById('button-upload').onclick = () => {
                 let file = e.target.files[0];
@@ -57,29 +56,6 @@
                             } else alert(response.message);
                         }
                     }
-                }
-            }
-        }
-
-        function fill_entity_list() {
-            const request = new XMLHttpRequest();
-            request.open('GET', '/models', false);
-            request.send();
-            if (request.status === 200) {
-                let entity_list = document.getElementById('list_entity');
-                entity_list.innerText = '';
-                let json = JSON.parse(request.response).json_list;
-                for (let i in json) {
-                    let u_list = document.createElement('ul');
-                    u_list.className = "nav navbar-nav";
-                    let list_item = document.createElement('li');
-                    let a = document.createElement('a');
-                    a.href = `/sqlite_decrypter/${json[i]}`;
-                    a.textContent = json[i];
-
-                    list_item.appendChild(a);
-                    u_list.appendChild(list_item);
-                    entity_list.appendChild(u_list);
                 }
             }
         }
