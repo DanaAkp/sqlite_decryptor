@@ -35,6 +35,14 @@ def get_entity_list():
     return jsonify(json_list=entities)
 
 
+@app.route('/models', methods=['POST'])
+def create_table():
+    if not request.is_json:
+        abort(400, 'Request must include json.')
+    # database_information.db.create()
+    return {}
+
+
 @app.route('/models/attributes/<string:entity_name>', methods=['GET'])
 def get_entity(entity_name):
     """Возвращает список аттрибутов данной сущности."""
