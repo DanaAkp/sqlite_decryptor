@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Column, Integer
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
@@ -24,11 +24,18 @@ class DatabaseInformation:
             file.write(db_file)
 
         self.db = create_engine('sqlite:///test.db')
-        Base = automap_base()
-        Base.prepare(self.db, reflect=True)
-        self.classes = Base.classes
+        self.Base = automap_base()
+        self.Base.prepare(self.db, reflect=True)
 
         session = scoped_session(sessionmaker(bind=self.db))
+        # class Test(Base):
+        #     __tablename__ = 'test'
+        #     id = Column(Integer, primary_key=True)
+        #
+        # Base.metadata.create_all(bind=self.db)
+        # Base.prepare()
+        # self.classes = Base.classes
+
         self._session = session
 
     @property
