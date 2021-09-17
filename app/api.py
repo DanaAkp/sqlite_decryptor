@@ -3,6 +3,7 @@ from flask import jsonify, request, abort
 from app.app import app, database_information
 from app.aes.aes import AES
 from app.utils import check_body_request, serializer
+from sqlalchemy import Table, Column, Integer, String, Text, Date, DateTime, Boolean, BINARY
 
 
 @app.route('/models', methods=['GET'])
@@ -18,12 +19,20 @@ def get_entity_list():
 def create_table():
     if not request.is_json:
         abort(400, 'Request must include json.')
-    # database_information.db.create()
-    database_information.db.execute('create table test_table (	'
-                                    'column_1 integer PRIMARY KEY,   	'
-                                    'column_2 varchar(20) NOT NULL,	'
-                                    'column_3 date DEFAULT 0);')
+    check_body_request(['table_name', 'columns', 'primary_key'])
+    json_data = request.get_json()
+    column_types = {'int': Integer,
+                    'str': String,
+                    'date_time': DateTime,
+                    'date': Date,
+                    'bool': Boolean,
+                    'bin': BINARY}
+    user = Table(json_data.get('table_name'), database_information.Base.metadata)
+    for i in json_data.get('columns'):
+        col = Column(i.get('column_name'), column_types.get(i.get('column_type')))
+        user.append_column(col)  # TODO not updates classes
 
+    database_information.set_classes()
     return {}
 
 
