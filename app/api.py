@@ -2,28 +2,7 @@ from flask import jsonify, request, abort
 
 from app.app import app, database_information
 from app.aes.aes import AES
-
-
-@app.errorhandler(404)
-def not_found(error):
-    return jsonify({'message': error.description})
-
-
-@app.errorhandler(400)
-def bad_request(error):
-    return jsonify({'message': error.description})
-
-
-@app.errorhandler(403)
-def forbidden(error):
-    return jsonify({'message': error.description})
-
-
-def serializer(object_to_serialize, attributes):
-    result = {}
-    for i in attributes:
-        result.setdefault(i, str(object_to_serialize.__getattribute__(i)))
-    return result
+from app.utils import check_body_request, serializer
 
 
 @app.route('/models', methods=['GET'])
@@ -40,6 +19,11 @@ def create_table():
     if not request.is_json:
         abort(400, 'Request must include json.')
     # database_information.db.create()
+    database_information.db.execute('create table test_table (	'
+                                    'column_1 integer PRIMARY KEY,   	'
+                                    'column_2 varchar(20) NOT NULL,	'
+                                    'column_3 date DEFAULT 0);')
+
     return {}
 
 
@@ -117,14 +101,7 @@ def delete_entity(entity_name, entity_id):
     return jsonify({'result': True})
 
 
-def check_body_request(fields):
-    if not request.json:
-        abort(400, 'Request body is required.')
-    for field in fields:
-        if field not in request.json:
-            abort(400, f'Field {field.replace("_", " ")} is required.')
-
-
+# region SQLDecrypter
 @app.route('/sqlite_decrypter/api/save_encrypted_db_file', methods=['GET'])
 def save_encrypted_db_file():
     """Возвращает зашифрованную копию текущей активной базы данных."""
@@ -165,3 +142,4 @@ def encrypt_db_file():
 
     except Exception as ex:
         abort(400, ex.args[0])  # TODO другой номер
+# endregion
