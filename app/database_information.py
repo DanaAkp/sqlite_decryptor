@@ -25,7 +25,8 @@ class DatabaseInformation:
 
         self.db = create_engine('sqlite:///test.db')
         self.Base = automap_base()
-        self.set_classes()
+        self.Base.prepare(self.db, reflect=True)
+        self.classes = self.Base.classes
 
         session = scoped_session(sessionmaker(bind=self.db))
         # class Test(Base):
@@ -38,7 +39,7 @@ class DatabaseInformation:
         self._session = session
 
     def set_classes(self):
-        self.Base.prepare(self.db, reflect=True)
+        self.Base.prepare()
         self.classes = self.Base.classes
 
     @property
