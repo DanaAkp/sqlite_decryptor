@@ -29,12 +29,6 @@ class DatabaseInformation:
         self.classes = self.Base.classes
 
         session = scoped_session(sessionmaker(bind=self.db))
-        # class Test(Base):
-        #     __tablename__ = 'test'
-        #     id = Column(Integer, primary_key=True)
-        #
-        # Base.metadata.create_all(bind=self.db)
-        # Base.prepare()
 
         self._session = session
 
