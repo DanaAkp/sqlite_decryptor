@@ -23,13 +23,16 @@ def create_table():
     json_data = request.get_json()
     column_types = {'int': Integer, 'str': String, 'date_time': DateTime, 'date': Date, 'bool': Boolean,
                     'bin': BINARY}
-    user = Table(json_data.get('table_name'), database_information.Base.metadata)
+    new_table = Table(json_data.get('table_name'), database_information.Base.metadata)
     for i in json_data.get('columns'):
-        col = Column(i.get('column_name'), column_types.get(i.get('column_type')),
+        if not all([i.get('column_name'), i.get('column_type'), i.get('primary_key'), i.get('nullable')]):
+            abort(400, 'Columns includes name, type, primary key and nullable.')
+        if (sql_type := column_types.get(i.get('column_type'))) is None:
+            abort(400, f'Type must be {list(column_types.keys())}.')
+        col = Column(i.get('column_name'), sql_type,
                      primary_key=i.get('primary_key'), nullable=i.get('nullable'))
-        user.append_column(col)
-
-    database_information.set_classes()
+        new_table.append_column(col)
+    new_table.create(bind=database_information.db)
     return {'result': True}
 
 
