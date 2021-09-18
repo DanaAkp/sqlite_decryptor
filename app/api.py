@@ -19,21 +19,18 @@ def get_entity_list():
 def create_table():
     if not request.is_json:
         abort(400, 'Request must include json.')
-    check_body_request(['table_name', 'columns', 'primary_key'])
+    check_body_request(['table_name', 'columns'])
     json_data = request.get_json()
-    column_types = {'int': Integer,
-                    'str': String,
-                    'date_time': DateTime,
-                    'date': Date,
-                    'bool': Boolean,
+    column_types = {'int': Integer, 'str': String, 'date_time': DateTime, 'date': Date, 'bool': Boolean,
                     'bin': BINARY}
     user = Table(json_data.get('table_name'), database_information.Base.metadata)
     for i in json_data.get('columns'):
-        col = Column(i.get('column_name'), column_types.get(i.get('column_type')))
-        user.append_column(col)  # TODO not updates classes
+        col = Column(i.get('column_name'), column_types.get(i.get('column_type')),
+                     primary_key=i.get('primary_key'), nullable=i.get('nullable'))
+        user.append_column(col)
 
     database_information.set_classes()
-    return {}
+    return {'result': True}
 
 
 @app.route('/models/attributes/<string:entity_name>', methods=['GET'])
@@ -63,7 +60,7 @@ def get_records(entity_name):
 def get_object(entity_name, entity_id):
     entity = database_information.classes[entity_name]
     primary_key = database_information.get_primary_key(entity_name)
-    object_ = database_information.session.query(entity).filter(primary_key==entity_id).first()
+    object_ = database_information.session.query(entity).filter(primary_key == entity_id).first()
     return jsonify(serializer(object_, database_information.get_entity_information(entity_name)))
 
 
