@@ -44,9 +44,12 @@ class DatabaseInformation:
     def get_entity_information(self, entity_name: str):
         """Возвращает набор полей данной сущнос"""
         columns = list(map(lambda x: x, self.classes[entity_name].__dict__['__table__'].columns))
+# TODO database_information.db.dialect.get_columns(database_information.db.connect(), 'roles') - get column information
+#
         return sorted(list(map(lambda x: x.name, columns)))
 
-    def get_primary_key(self, entity_name:str):
+    def get_primary_key(self, entity_name: str):
+        # TODO
         columns = self.classes[entity_name].__dict__['__table__'].columns
         for i in columns:
             if i.primary_key:

@@ -11,7 +11,7 @@ def get_entity_list():
     """Возвращает список сущностей базы данных."""
     if database_information.classes is None:
         abort(500, 'Database file does not uploaded yet.')
-    entities = database_information.classes.keys()
+    entities = database_information.db.table_names()
     return jsonify(json_list=entities)
 
 
