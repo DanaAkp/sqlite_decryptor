@@ -33,6 +33,15 @@ def create_table():
     return {'result': True}
 
 
+@app.route('/models/<string:name_table>', methods=['DELETE'])
+def delete_table(name_table):
+    if not database_information.db.has_table(name_table):
+        abort(404, f'Not found table "{name_table}"')
+    table = database_information.Base.metadata.tables.get(name_table)
+    table.drop(bind=database_information.db)
+    return {'result': True}
+
+
 @app.route('/models/attributes/<string:entity_name>', methods=['GET'])
 def get_entity(entity_name):
     """Возвращает список аттрибутов данной сущности."""
