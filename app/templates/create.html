@@ -19,7 +19,7 @@
         let input_attributes = document.getElementById('input-attributes');
 
         const request = new XMLHttpRequest();
-        request.open('GET', `/models/attributes/${entity_name}`, false);
+        request.open('GET', `/api/models/attributes/${entity_name}`, false);
         request.send();
         let attributes = JSON.parse(request.response).json_list;
         for (let i in attributes) {
@@ -40,7 +40,7 @@
 
         function add_new_object() {
             const request = new XMLHttpRequest();
-            request.open('POST', `/models/${entity_name}`, true);
+            request.open('POST', `/api/models/${entity_name}`, true);
             request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
             let json = {};
             for (let i in attributes) {

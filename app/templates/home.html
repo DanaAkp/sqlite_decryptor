@@ -37,7 +37,7 @@
                 reader.onload = reader_event => {
                     let content = reader_event.target.result;
                     const request = new XMLHttpRequest();
-                    request.open('POST', '/sqlite_decrypter/api/upload_encrypted_db_file', true);
+                    request.open('POST', '/api/sql_decrypter', true);
                     request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
                     let json = JSON.stringify({
                         database_file: content,
@@ -72,7 +72,7 @@
                     let arr = new Uint8Array(content);
                     let hex = to_hex_string(arr);
                     const request = new XMLHttpRequest();
-                    request.open('POST', '/sqlite_decrypter/api/encrypt_db_file', true);
+                    request.open('POST', '/api/sqlite_encryptor', true);
                     request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
                     request.send(JSON.stringify({
                         'database_file': hex,
@@ -118,7 +118,7 @@
 
         function save_encrypted_db_file() {
             const request = new XMLHttpRequest();
-            request.open('GET', '/sqlite_decrypter/api/save_encrypted_db_file', false);
+            request.open('GET', '/api/sql_decrypter', false);
             request.send();
 
             let textData = JSON.parse(request.response).encrypted_file;
@@ -130,7 +130,7 @@
 
         function clear_current_db_file() {
             const request = new XMLHttpRequest();
-            request.open('DELETE', '/sqlite_decrypter/api/clear_current_db_file', false);
+            request.open('DELETE', '/api/sql_decrypter', false);
             request.send();
             if (request.status === 200) {
                 window.location.reload();

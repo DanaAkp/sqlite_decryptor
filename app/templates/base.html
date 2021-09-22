@@ -26,7 +26,7 @@
     fill_entity_list();
         function fill_entity_list() {
             const request = new XMLHttpRequest();
-            request.open('GET', '/models', false);
+            request.open('GET', '/api/models', false);
             request.send();
             if (request.status === 200) {
                 let entity_list = document.getElementById('list_entity');

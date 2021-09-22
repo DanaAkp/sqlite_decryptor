@@ -39,7 +39,7 @@
             }
             let t_head = document.createElement('thead');
             const request = new XMLHttpRequest();
-            request.open('GET', `/models/attributes/${entity_name}`, false);
+            request.open('GET', `/api/models/attributes/${entity_name}`, false);
             request.send();
             let json = JSON.parse(request.response).json_list;
             for (let i in json) {
@@ -49,7 +49,7 @@
             }
             table.appendChild(t_head);
 
-            request.open('GET', `/models/${entity_name}`, false);
+            request.open('GET', `/api/models/${entity_name}`, false);
             request.send();
             json = JSON.parse(request.response).json_list;
             let t_body = document.createElement('tbody');
@@ -61,7 +61,7 @@
                     row.appendChild(td);
                 }
                 const request_primary_key = new XMLHttpRequest();
-                request_primary_key.open('GET', `/models/primary_key/${entity_name}`, false);
+                request_primary_key.open('GET', `/api/models/primary_key/${entity_name}`, false);
                 request_primary_key.send();
 
                 let id = json[i][JSON.parse(request_primary_key.response).primary_key];
@@ -97,7 +97,7 @@
         function delete_function(id) {
             return function () {
                 const request = new XMLHttpRequest();
-                request.open('DELETE', `/models/${entity_name}/${id}`, false);
+                request.open('DELETE', `/api/models/${entity_name}/${id}`, false);
                 request.send();
                 if (request.status !== 200)
                     alert(JSON.parse(request.response).message);
