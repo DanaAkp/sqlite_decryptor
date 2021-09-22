@@ -118,7 +118,6 @@ class ObjectEntityController(Resource):
         return jsonify({'result': True})
 
 
-# region SQLDecrypter
 @api.route('/sql_decrypter')
 class SQLDecrypter(Resource):
     def get(self):
@@ -156,5 +155,3 @@ class SQLEncryptor(Resource):
 
         except Exception as ex:
             abort(400, ex.args[0])
-
-# endregion
