@@ -22,7 +22,7 @@ def create_table():
     check_body_request(['table_name', 'columns'])
     json_data = request.get_json()
     column_types = {'int': Integer, 'str': String, 'date_time': DateTime, 'date': Date, 'bool': Boolean,
-                    'bin': BINARY}
+                    'bin': BINARY, 'text': Text}
     new_table = Table(json_data.get('table_name'), database_information.Base.metadata)
     for i in json_data.get('columns'):
         if not all([i.get('column_name'), i.get('column_type'), i.get('primary_key'), i.get('nullable')]):
