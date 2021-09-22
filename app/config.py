@@ -8,7 +8,7 @@ class Config(object):
     PUBLIC_PATH = 'public_html' if os.path.isdir('public_html') \
         else os.path.join(ROOT_PATH, os.path.pardir, os.path.pardir, 'web')
     DATA_PATH = os.path.join(ROOT_PATH, 'data')
-    STATIC_FOLDER = os.path.join(PUBLIC_PATH, 'static')
+    STATIC_FOLDER = os.path.join(ROOT_PATH, 'static')
     MEDIA_IMAGES_PATH = os.path.join('media', 'images')
 
     SQLALCHEMY_DATABASE_URI = "sqlite:///%s/develop.db" % DATA_PATH
