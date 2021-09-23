@@ -2,10 +2,11 @@ from flask import request, abort
 
 
 def check_body_request(fields):
-    if not request.json:
+    if not request.is_json:
         abort(400, 'Request body is required.')
+    json_data = request.json
     for field in fields:
-        if field not in request.json:
+        if field not in json_data:
             abort(400, f'Field {field.replace("_", " ")} is required.')
 
 

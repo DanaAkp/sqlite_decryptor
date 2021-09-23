@@ -7,6 +7,10 @@ from app.utils import check_body_request, serializer
 from sqlalchemy import Table, Column, Integer, String, Text, Date, DateTime, Boolean, BINARY
 
 
+column_types = {'int': Integer, 'str': String, 'date_time': DateTime, 'date': Date, 'bool': Boolean,
+                'bin': BINARY, 'text': Text}
+
+
 @api.route('/models', methods=['GET', 'POST'])
 @api.route('/models/<string:name_table>', methods=['DELETE'])
 class ModelsController(Resource):
@@ -19,12 +23,8 @@ class ModelsController(Resource):
 
     def post(self):
         """Метод для создания новых таблиц."""
-        if not request.is_json:
-            abort(400, 'Request must include json.')
         check_body_request(['table_name', 'columns'])
         json_data = request.get_json()
-        column_types = {'int': Integer, 'str': String, 'date_time': DateTime, 'date': Date, 'bool': Boolean,
-                        'bin': BINARY, 'text': Text}
         new_table = Table(json_data.get('table_name'), database_information.Base.metadata)
         for i in json_data.get('columns'):
             if not all([i.get('column_name'), i.get('column_type'), i.get('primary_key'), i.get('nullable')]):
@@ -161,3 +161,46 @@ class SQLEncryptor(Resource):
 
         except Exception as ex:
             abort(400, ex.args[0])
+
+
+@api.route('/columns/<string:table_name>', methods=['POST'])
+@api.route('/columns/<string:table_name>/<string:column_name>', methods=['PUT', 'DELETE'])
+class ColumnsController(Resource):
+    def post(self, table_name):
+        """Метод для добавления новых колонок в таблицу"""
+        if not database_information.db.has_table(table_name):
+            abort(400, f'Table {table_name} not found.')
+
+        check_body_request(['column_name', 'column_type'])
+        json_data = request.get_json()
+
+        if (sql_type := column_types.get(json_data.get('column_type'))) is None:
+            abort(400, f'Type must be {list(column_types.keys())}.')
+
+        new_column = Column(json_data.get('column_name'), sql_type)
+        table = database_information.classes['Debtors'].__table__
+        table.append_column(new_column)
+        return {'result': True}, 201
+
+    # def put(self, table_name, column_name):
+    #     """Метод для изменения колонки таблицы."""
+    #     if not database_information.db.has_table(table_name):
+    #         abort(400, f'Table {table_name} not found.')
+    #
+    #     check_body_request(['column_name', 'column_type'])
+    #     json_data = request.get_json()
+    #
+    #     if (sql_type := column_types.get(json_data.get('column_type'))) is None:
+    #         abort(400, f'Type must be {list(column_types.keys())}.')
+    #
+    #     table = database_information.classes['Debtors'].__table__
+    #
+    #     return {'result': True}, 201
+
+    def delete(self, table_name, column_name):
+        """Метод для удаления колонки таблицы."""
+        if not database_information.db.has_table(table_name):
+            abort(400, f'Table {table_name} not found.')
+
+        table = database_information.classes['Debtors'].__table__
+        return {'result': True}
