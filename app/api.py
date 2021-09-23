@@ -18,6 +18,7 @@ class ModelsController(Resource):
         return jsonify(json_list=entities)
 
     def post(self):
+        """Метод для создания новых таблиц."""
         if not request.is_json:
             abort(400, 'Request must include json.')
         check_body_request(['table_name', 'columns'])
@@ -37,6 +38,7 @@ class ModelsController(Resource):
         return {'result': True}
 
     def delete(self, name_table):
+        """Метод для удаления таблиц."""
         if not database_information.db.has_table(name_table):
             abort(404, f'Not found table "{name_table}"')
         table = database_information.Base.metadata.tables.get(name_table)
@@ -55,6 +57,7 @@ class RecordsController(Resource):
         return jsonify(json_list=buf)
 
     def post(self, entity_name):
+        """Метод для добавления новой записи в таблицу."""
         attributes = database_information.get_entity_information(entity_name)
         check_body_request(attributes)
 
@@ -89,12 +92,14 @@ class PrimaryKeyController(Resource):
 @api.route('/models/<string:entity_name>/<entity_id>', methods=['GET', 'PUT', 'DELETE'])
 class ObjectEntityController(Resource):
     def get(self, entity_name, entity_id):
+        """Метод для получения записи таблицы по ее идентификатору."""
         entity = database_information.classes[entity_name]
         primary_key = database_information.get_primary_key(entity_name)
         object_ = database_information.session.query(entity).filter(primary_key == entity_id).first()
         return jsonify(serializer(object_, database_information.get_entity_information(entity_name)))
 
     def put(self, entity_name, entity_id):
+        """Метод для обновления записи таблицы по ее идентификатору."""
         attributes = database_information.get_entity_information(entity_name)
         check_body_request(attributes)
         entity = database_information.classes[entity_name]
@@ -110,6 +115,7 @@ class ObjectEntityController(Resource):
         return jsonify(serializer(object_, attributes))
 
     def delete(self, entity_name, entity_id):
+        """Метод для удаления записи таблицы по ее идентификатору."""
         entity = database_information.classes[entity_name]
         primary_key = database_information.get_primary_key(entity_name)
         object_ = database_information.session.query(entity).filter(primary_key == entity_id).first()
