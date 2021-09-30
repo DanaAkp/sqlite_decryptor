@@ -1,5 +1,5 @@
 
-        let entity_name = '{{ entity_name }}';
+        let entity_name = document.getElementById('entity_name').dataset.geocode;;
         create_table();
 
         function create_table() {

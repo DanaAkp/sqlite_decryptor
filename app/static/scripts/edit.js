@@ -1,5 +1,5 @@
- let entity_name = '{{ entity_name }}';
-        let id = '{{ entity_id }}';
+ let entity_name = document.getElementById('entity_name').dataset.geocode;
+        let id = document.getElementById('entity_id').dataset.geocode;
         let input_attributes = document.getElementById('input-attributes');
 
         const request = new XMLHttpRequest();

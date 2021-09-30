@@ -20,6 +20,7 @@
     </style>
     <h1>{{ entity_name }}</h1>
     <table id="table-entity" class="table"></table>
+    <div id="entity_name" data-geocode="{{ entity_name }}"></div>
     <input type="button" onclick="create_function()"
     style="background-image:
     url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/wD/AP+gvaeTAAAAkElEQVRoge3YQQqAMAxE0eixpJ5ePZcu3IjYNkLIQPkPupOmsygONQOAkRxmdnbWFjlwitzM7gOmzp2jNlIhgBoB1AigRgA1AjysP74tgXOrPMUsa1ULYKtUeYtZls+zcgfUCKBGALWhA+xpp+gLfcmoKeb/sy5RQ3lWUSOAGgHUCKBGADUCvHgKYEoxA4AcF/q+PhlpvdipAAAAAElFTkSuQmCC');
@@ -27,6 +28,6 @@
     background-repeat: no-repeat;
     height: 30px;
     width: 30px;">
-    <script src="static/scripts/list.js">
+    <script src="../static/scripts/list.js">
     </script>
 {% endblock %}

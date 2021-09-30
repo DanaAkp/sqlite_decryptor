@@ -1,4 +1,4 @@
-let entity_name = '{{ entity_name }}';
+let entity_name = document.getElementById('entity_name').dataset.geocode;
 let input_attributes = document.getElementById('input-attributes');
 const request = new XMLHttpRequest();
 request.open('GET', `/api/models/attributes/${entity_name}`, false);
