@@ -21,3 +21,8 @@ def page(entity_name):
 @app.route('/sqlite_decrypter/edit/<string:entity_name>/<entity_id>')
 def page_edit(entity_name, entity_id):
     return render_template('edit.html', entity_name=entity_name, entity_id=entity_id)
+
+
+@app.route('/sqlite_decrypter/add_new_table')
+def add_new_table():
+    return render_template('add_new_table.html')

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+
+{% block page_content %}
+    <h1>Create new entity</h1>
+    <br>
+    <div id="input-columns">
+        <table id="columns">
+            <thead>
+            <th>name</th>
+            <th>type</th>
+            <th>primary key</th>
+            <th>nullable</th>
+            </thead>
+            <tbody id="tbody-columns">
+            <tr>
+                <td><input type="text"></td>
+                <td><input type="text"></td>
+                <td><input type="text"></td>
+                <td><input type="text"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <p><input type="button" value="add column" onclick="add_column_input()"></p>
+    <br>
+    <p>
+        <input type="button" onclick="add_new_table()" value="add new table">
+    </p>
+
+    <script src="../static/scripts/add_new_table.js">
+    </script>
+{% endblock %}
