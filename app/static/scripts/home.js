@@ -44,7 +44,7 @@
                     let arr = new Uint8Array(content);
                     let hex = to_hex_string(arr);
                     const request = new XMLHttpRequest();
-                    request.open('POST', '/api/sqlite_encryptor', true);
+                    request.open('POST', '/api/sql_encryptor', true);
                     request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
                     request.send(JSON.stringify({
                         'database_file': hex,

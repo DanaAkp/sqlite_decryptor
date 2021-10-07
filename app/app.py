@@ -20,7 +20,7 @@ app.register_blueprint(blueprint)
 bootstrap = Bootstrap(app)
 
 
-database_information = DatabaseInformation()
+db_info = DatabaseInformation()
 
 
 from app.api import *

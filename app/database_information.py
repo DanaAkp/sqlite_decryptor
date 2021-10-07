@@ -1,3 +1,4 @@
+from flask import jsonify
 from sqlalchemy import create_engine, Column, Integer
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -8,7 +9,8 @@ class DatabaseInformation:
         self._session = None
         self._database_file = None
         self._password = None
-        self.classes = None
+        self.db = None
+        self.Base = None
 
     @property
     def session(self):
@@ -26,37 +28,34 @@ class DatabaseInformation:
         self.db = create_engine('sqlite:///test.db')
         self.Base = automap_base()
         self.Base.prepare(self.db, reflect=True)
-        self.classes = self.Base.classes
 
         session = scoped_session(sessionmaker(bind=self.db))
 
         self._session = session
-
-    def set_classes(self):
-        self.Base.prepare()
-        self.classes = self.Base.classes
 
     @property
     def database_file(self):
         with open('test.db', 'rb') as file:
             return file.read()
 
-    def get_entity_information(self, entity_name: str):
-        """Возвращает набор полей данной сущнос"""
-        columns = list(map(lambda x: x, self.classes[entity_name].__dict__['__table__'].columns))
-# TODO database_information.db.dialect.get_columns(database_information.db.connect(), 'roles') - get column information
-#
-        return sorted(list(map(lambda x: x.name, columns)))
+    def get_attributes(self, entity_name: str):
+        """Возвращает набор полей данной сущности"""
+        columns = list(map(lambda x: x, self.db.dialect.get_columns(self.db.connect(), entity_name)))
+        return sorted(list(map(lambda x: x.get('name'), columns)))
 
     def get_primary_key(self, entity_name: str):
-        # TODO
-        columns = self.classes[entity_name].__dict__['__table__'].columns
-        for i in columns:
-            if i.primary_key:
-                return i
+        columns = self.Base.metadata.tables.get(entity_name).primary_key.columns.keys()
+        if columns and len(columns) == 1:
+            return {'primary_key': columns[0]}
+        else:
+            return list(self.db.table_names())
 
     def clear(self):
         self._session = None
-        self.classes = None
         self._password = None
         self._database_file = None
+        self.db = None
+        self.Base = None
+
+    def get_entity(self, entity_name):
+        return self.Base.metadata.tables.get(entity_name)

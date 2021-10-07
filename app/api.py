@@ -1,7 +1,7 @@
 from flask import jsonify, request, abort
 from flask_restx import Resource
 
-from app.app import api, app, database_information
+from app.app import api, app, db_info
 from app.aes.aes import AES
 from app.utils import check_body_request, serializer
 from sqlalchemy import Table, Column, Integer, String, Text, Date, DateTime, Boolean, BINARY
@@ -16,16 +16,16 @@ column_types = {'int': Integer, 'str': String, 'date_time': DateTime, 'date': Da
 class ModelsController(Resource):
     def get(self):
         """Возвращает список сущностей базы данных."""
-        if database_information.classes is None:
+        if db_info.db is None:
             abort(500, 'Database file does not uploaded yet.')
-        entities = database_information.db.table_names()
+        entities = db_info.db.table_names()
         return jsonify(json_list=entities)
 
     def post(self):
         """Метод для создания новых таблиц."""
         check_body_request(['table_name', 'columns'])
         json_data = request.get_json()
-        new_table = Table(json_data.get('table_name'), database_information.Base.metadata)
+        new_table = Table(json_data.get('table_name'), db_info.Base.metadata)
         for i in json_data.get('columns'):
             if not all([i.get('column_name'), i.get('column_type'), i.get('primary_key'), i.get('nullable')]):
                 abort(400, 'Columns includes name, type, primary key and nullable.')
@@ -34,15 +34,15 @@ class ModelsController(Resource):
             col = Column(i.get('column_name'), sql_type,
                          primary_key=i.get('primary_key'), nullable=i.get('nullable'))
             new_table.append_column(col)
-        new_table.create(bind=database_information.db)
+        new_table.create(bind=db_info.db)
         return {'result': True}
 
     def delete(self, name_table):
         """Метод для удаления таблиц."""
-        if not database_information.db.has_table(name_table):
+        if not db_info.db.has_table(name_table):
             abort(404, f'Not found table "{name_table}"')
-        table = database_information.Base.metadata.tables.get(name_table)
-        table.drop(bind=database_information.db)
+        table = db_info.Base.metadata.tables.get(name_table)
+        table.drop(bind=db_info.db)
         return {'result': True}
 
 
@@ -50,35 +50,35 @@ class ModelsController(Resource):
 class RecordsController(Resource):
     def get(self, entity_name):
         """Возвращает список записей для данной сущности. """
-        entity = database_information.classes[entity_name]
-        attributes = database_information.get_entity_information(entity_name)
-        records = database_information.session.query(entity).all()
+        entity = db_info.get_entity(entity_name)
+        attributes = db_info.get_attributes(entity_name)
+        records = db_info.session.query(entity).all()
         buf = list(map(lambda x: serializer(x, attributes), records))
         return jsonify(json_list=buf)
 
     def post(self, entity_name):
         """Метод для добавления новой записи в таблицу."""
-        attributes = database_information.get_entity_information(entity_name)
+        attributes = db_info.get_attributes(entity_name)
         check_body_request(attributes)
 
-        entity = database_information.classes[entity_name]
+        entity = db_info.get_entity(entity_name)
         new_object = entity()
         for i in attributes:
             try:
                 setattr(new_object, i, request.json[i])
             except:
                 continue
-        database_information.session.add(new_object)
-        database_information.session.commit()
+        db_info.session.add(new_object)
+        db_info.session.commit()
 
-        return jsonify(serializer(new_object, attributes)), 201
+        return serializer(new_object, attributes), 201
 
 
 @api.route('/models/attributes/<string:entity_name>', methods=['GET'])
 class AttributesController(Resource):
     def get(self, entity_name):
         """Возвращает список аттрибутов данной сущности."""
-        attributes = database_information.get_entity_information(entity_name)
+        attributes = db_info.get_attributes(entity_name)
         return jsonify(json_list=attributes)
 
 
@@ -86,51 +86,51 @@ class AttributesController(Resource):
 class PrimaryKeyController(Resource):
     def get(self, entity_name):
         """Возвращает название ключевого поля."""
-        return jsonify({'primary_key': database_information.get_primary_key(entity_name).name})
+        return db_info.get_primary_key(entity_name)
 
 
 @api.route('/models/<string:entity_name>/<entity_id>', methods=['GET', 'PUT', 'DELETE'])
 class ObjectEntityController(Resource):
     def get(self, entity_name, entity_id):
         """Метод для получения записи таблицы по ее идентификатору."""
-        entity = database_information.classes[entity_name]
-        primary_key = database_information.get_primary_key(entity_name)
-        object_ = database_information.session.query(entity).filter(primary_key == entity_id).first()
-        return jsonify(serializer(object_, database_information.get_entity_information(entity_name)))
+        entity = db_info.get_entity(entity_name)
+        primary_key = db_info.get_primary_key(entity_name)
+        object_ = db_info.session.query(entity).filter(primary_key == entity_id).first()
+        return serializer(object_, db_info.get_attributes(entity_name))
 
     def put(self, entity_name, entity_id):
         """Метод для обновления записи таблицы по ее идентификатору."""
-        attributes = database_information.get_entity_information(entity_name)
+        attributes = db_info.get_attributes(entity_name)
         check_body_request(attributes)
-        entity = database_information.classes[entity_name]
-        primary_key = database_information.get_primary_key(entity_name)
-        object_ = database_information.session.query(entity).filter(primary_key == entity_id).first()
+        entity = db_info.get_entity(entity_name)
+        primary_key = db_info.get_primary_key(entity_name)
+        object_ = db_info.session.query(entity).filter(primary_key == entity_id).first()
         for i in attributes:
             try:
                 setattr(object_, i, request.json[i])
             except:
                 continue
-        database_information.session.commit()
+        db_info.session.commit()
 
-        return jsonify(serializer(object_, attributes))
+        return serializer(object_, attributes)
 
     def delete(self, entity_name, entity_id):
         """Метод для удаления записи таблицы по ее идентификатору."""
-        entity = database_information.classes[entity_name]
-        primary_key = database_information.get_primary_key(entity_name)
-        object_ = database_information.session.query(entity).filter(primary_key == entity_id).first()
-        database_information.session.delete(object_)
-        database_information.session.commit()
-        return jsonify({'result': True})
+        entity = db_info.get_entity(entity_name)
+        primary_key = db_info.get_primary_key(entity_name)
+        object_ = db_info.session.query(entity).filter(primary_key == entity_id).first()
+        db_info.session.delete(object_)
+        db_info.session.commit()
+        return {'result': True}
 
 
 @api.route('/sql_decrypter')
 class SQLDecrypter(Resource):
     def get(self):
         """Возвращает зашифрованную копию текущей активной базы данных."""
-        aes = AES(database_information._password.encode('utf-8'))
-        encrypted_db = aes.encrypt(database_information.database_file)
-        return jsonify({'encrypted_file': encrypted_db.hex()})
+        aes = AES(db_info._password.encode('utf-8'))
+        encrypted_db = aes.encrypt(db_info.database_file)
+        return {'encrypted_file': encrypted_db.hex()}
 
     def post(self):
         """Загружает и расшифровывает файл базы данных для дальнейшей работы с ней."""
@@ -138,15 +138,15 @@ class SQLDecrypter(Resource):
         try:
             aes = AES(request.json['password'].encode('utf-8'))
             decrypted_file = aes.decrypt(bytes.fromhex(request.json['database_file']))
-            database_information.session = (decrypted_file, request.json['password'])
-            return jsonify({'result': True})
+            db_info.session = (decrypted_file, request.json['password'])
+            return {'result': True}
         except Exception as ex:
             abort(400, ex.args[0])
 
     def delete(self):
         """Удаление информации о текущей заугрженной в систему базе данных."""
-        database_information.clear()
-        return jsonify({'result': True})
+        db_info.clear()
+        return {'result': True}
 
 
 @api.route('/sql_encryptor')
@@ -157,7 +157,7 @@ class SQLEncryptor(Resource):
         try:
             aes = AES(request.json['password'].encode('utf-8'))
             encrypted_file = aes.encrypt(bytes.fromhex(request.json['database_file']))
-            return jsonify({'encrypted_file': encrypted_file.hex()})
+            return {'encrypted_file': encrypted_file.hex()}
 
         except Exception as ex:
             abort(400, ex.args[0])
@@ -167,8 +167,9 @@ class SQLEncryptor(Resource):
 @api.route('/columns/<string:table_name>/<string:column_name>', methods=['PUT', 'DELETE'])
 class ColumnsController(Resource):
     def post(self, table_name):
+        # TODO проверить
         """Метод для добавления новых колонок в таблицу"""
-        if not database_information.db.has_table(table_name):
+        if not db_info.db.has_table(table_name):
             abort(400, f'Table {table_name} not found.')
 
         check_body_request(['column_name', 'column_type'])
@@ -178,10 +179,11 @@ class ColumnsController(Resource):
             abort(400, f'Type must be {list(column_types.keys())}.')
 
         new_column = Column(json_data.get('column_name'), sql_type)
-        table = database_information.classes['Debtors'].__table__
+        table = db_info.get_entity(table_name)
         table.append_column(new_column)
         return {'result': True}, 201
 
+    # TODO
     # def put(self, table_name, column_name):
     #     """Метод для изменения колонки таблицы."""
     #     if not database_information.db.has_table(table_name):
@@ -198,9 +200,10 @@ class ColumnsController(Resource):
     #     return {'result': True}, 201
 
     def delete(self, table_name, column_name):
+        # TODO
         """Метод для удаления колонки таблицы."""
-        if not database_information.db.has_table(table_name):
+        if not db_info.db.has_table(table_name):
             abort(400, f'Table {table_name} not found.')
 
-        table = database_information.classes['Debtors'].__table__
+        table = db_info.get_entity(table_name)
         return {'result': True}

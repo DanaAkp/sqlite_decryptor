@@ -43,12 +43,12 @@
                 if (request.readyState === 4) {
                     console.log(request.response);
                     if (request.status === 200) {
-                        window.location.href = `/sqlite_decrypter/${entity_name}`;
+                        window.location.href = `/sql_decrypter/${entity_name}`;
                     } else alert(JSON.parse(request.response).message);
                 }
             }
         }
 
         function cancel() {
-            window.location.href = `/sqlite_decrypter/${entity_name}`;
+            window.location.href = `/sql_decrypter/${entity_name}`;
         }

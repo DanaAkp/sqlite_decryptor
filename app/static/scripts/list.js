@@ -81,10 +81,10 @@
 
         function edit_function(id) {
             return function () {
-                window.location.href = `/sqlite_decrypter/edit/${entity_name}/${id}`
+                window.location.href = `/sql_decrypter/edit/${entity_name}/${id}`
             }
         }
 
         function create_function() {
-            window.location.href = `/sqlite_decrypter/create/${entity_name}`;
+            window.location.href = `/sql_decrypter/create/${entity_name}`;
         }

@@ -33,7 +33,7 @@ function add_new_object() {
     request.onreadystatechange = function () {
         if (request.readyState === 4) {
             if (request.status === 201) {
-                window.location.href = `/sqlite_decrypter/${entity_name}`;
+                window.location.href = `/sql_decrypter/${entity_name}`;
             } else alert(JSON.parse(request.response).message);
         }
     }
