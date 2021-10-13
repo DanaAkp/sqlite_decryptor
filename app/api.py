@@ -213,3 +213,10 @@ class ColumnsController(Resource):
 
         table = db_info.get_entity(table_name)
         return {'result': True}
+
+
+@api.route('/database/<string:database_name>')
+class DatabaseController(Resource):
+    # todo
+    def post(self, database_name):
+        pass

@@ -59,3 +59,13 @@ class DatabaseInformation:
 
     def get_entity(self, entity_name):
         return self.Base.metadata.tables.get(entity_name)
+
+    def add_new_record_into_table(self, entity_name):
+        # todo
+        entity = self.get_entity(entity_name)
+        attributes = self.get_attributes(entity_name)
+        at = dict()
+        # for i in attributes:
+        #     at[i] = request.json[i]
+        # ins = entity.insert().values(at)
+        # db_info.db.execute(ins)

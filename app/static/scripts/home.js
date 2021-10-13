@@ -109,3 +109,11 @@
                 alert('The current database file has been cleaned up successfully.')
             }
         }
+
+
+        let input_new_db_name = document.getElementById('input-new-database-name')
+        input_new_db_name.onchange = e => {
+            document.getElementById('button-create-new-database').onclick = () => {
+
+            }
+        }
