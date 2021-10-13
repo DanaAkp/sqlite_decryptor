@@ -61,7 +61,7 @@ class RecordsController(Resource):
         attributes = db_info.get_attributes(entity_name)
         check_body_request(attributes)
 
-        entity = db_info.get_entity(entity_name)
+        entity = db_info.Base.classes[entity_name]
         new_object = entity()
         for i in attributes:
             try:
@@ -70,6 +70,12 @@ class RecordsController(Resource):
                 continue
         db_info.session.add(new_object)
         db_info.session.commit()
+        # entity = db_info.get_entity(entity_name)
+        # at = dict()
+        # for i in attributes:
+        #     at[i] = request.json[i]
+        # ins = entity.insert().values(at)
+        # db_info.db.execute(ins)
 
         return serializer(new_object, attributes), 201
 
