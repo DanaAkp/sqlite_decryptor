@@ -50,15 +50,15 @@ class ModelsController(Resource):
 class RecordsController(Resource):
     def get(self, entity_name):
         """Возвращает список записей для данной сущности. """
-        entity = db_info.get_entity(entity_name)
-        attributes = db_info.get_attributes(entity_name)
+        entity = db_info.get_tables(entity_name)
+        attributes = db_info.get_columns(entity_name)
         records = db_info.session.query(entity).all()
         buf = list(map(lambda x: serializer(x, attributes), records))
         return jsonify(json_list=buf)
 
     def post(self, entity_name):
         """Метод для добавления новой записи в таблицу."""
-        attributes = db_info.get_attributes(entity_name)
+        attributes = db_info.get_columns(entity_name)
         check_body_request(attributes)
 
         entity = db_info.Base.classes[entity_name]
@@ -84,7 +84,7 @@ class RecordsController(Resource):
 class AttributesController(Resource):
     def get(self, entity_name):
         """Возвращает список аттрибутов данной сущности."""
-        attributes = db_info.get_attributes(entity_name)
+        attributes = db_info.get_columns(entity_name)
         return jsonify(json_list=attributes)
 
 
@@ -99,16 +99,16 @@ class PrimaryKeyController(Resource):
 class ObjectEntityController(Resource):
     def get(self, entity_name, entity_id):
         """Метод для получения записи таблицы по ее идентификатору."""
-        entity = db_info.get_entity(entity_name)
+        entity = db_info.get_tables(entity_name)
         primary_key = db_info.get_primary_key(entity_name)
         object_ = db_info.session.query(entity).filter(primary_key == entity_id).first()
-        return serializer(object_, db_info.get_attributes(entity_name))
+        return serializer(object_, db_info.get_columns(entity_name))
 
     def put(self, entity_name, entity_id):
         """Метод для обновления записи таблицы по ее идентификатору."""
-        attributes = db_info.get_attributes(entity_name)
+        attributes = db_info.get_columns(entity_name)
         check_body_request(attributes)
-        entity = db_info.get_entity(entity_name)
+        entity = db_info.get_tables(entity_name)
         primary_key = db_info.get_primary_key(entity_name)
         object_ = db_info.session.query(entity).filter(primary_key == entity_id).first()
         for i in attributes:
@@ -122,7 +122,7 @@ class ObjectEntityController(Resource):
 
     def delete(self, entity_name, entity_id):
         """Метод для удаления записи таблицы по ее идентификатору."""
-        entity = db_info.get_entity(entity_name)
+        entity = db_info.get_tables(entity_name)
         primary_key = db_info.get_primary_key(entity_name)
         object_ = db_info.session.query(entity).filter(primary_key == entity_id).first()
         db_info.session.delete(object_)
@@ -151,7 +151,7 @@ class SQLDecrypter(Resource):
 
     def delete(self):
         """Удаление информации о текущей заугрженной в систему базе данных."""
-        db_info.clear()
+        db_info.clear_db()
         return {'result': True}
 
 
@@ -185,7 +185,7 @@ class ColumnsController(Resource):
             abort(400, f'Type must be {list(column_types.keys())}.')
 
         new_column = Column(json_data.get('column_name'), sql_type)
-        table = db_info.get_entity(table_name)
+        table = db_info.get_tables(table_name)
         table.append_column(new_column)
         return {'result': True}, 201
 
@@ -211,7 +211,7 @@ class ColumnsController(Resource):
         if not db_info.db.has_table(table_name):
             abort(400, f'Table {table_name} not found.')
 
-        table = db_info.get_entity(table_name)
+        table = db_info.get_tables(table_name)
         return {'result': True}
 
 

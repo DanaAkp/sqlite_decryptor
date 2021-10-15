@@ -38,10 +38,13 @@ class DatabaseInformation:
         with open('test.db', 'rb') as file:
             return file.read()
 
-    def get_attributes(self, entity_name: str):
+    def get_columns(self, entity_name: str):
         """Возвращает набор полей данной сущности"""
         columns = list(map(lambda x: x, self.db.dialect.get_columns(self.db.connect(), entity_name)))
         return sorted(list(map(lambda x: x.get('name'), columns)))
+
+    def add_column(self, entity_name: str, column: dict):
+        pass
 
     def get_primary_key(self, entity_name: str):
         columns = self.Base.metadata.tables.get(entity_name).primary_key.columns.keys()
@@ -50,22 +53,31 @@ class DatabaseInformation:
         else:
             return list(self.db.table_names())
 
-    def clear(self):
+    def clear_db(self):
         self._session = None
         self._password = None
         self._database_file = None
         self.db = None
         self.Base = None
 
-    def get_entity(self, entity_name):
+    def get_tables(self, entity_name):
         return self.Base.metadata.tables.get(entity_name)
 
-    def add_new_record_into_table(self, entity_name):
+    def add_table(self, name: str, columns: list):
+        pass
+
+    def delete_table(self, name: str, columns: list):
+        pass
+
+    def add_row(self, entity_name: str, attr: list):
         # todo
-        entity = self.get_entity(entity_name)
-        attributes = self.get_attributes(entity_name)
+        entity = self.get_tables(entity_name)
+        attributes = self.get_columns(entity_name)
         at = dict()
         # for i in attributes:
         #     at[i] = request.json[i]
         # ins = entity.insert().values(at)
         # db_info.db.execute(ins)
+
+    def delete_row(self, entity_name: str, pk: object):
+        pass
