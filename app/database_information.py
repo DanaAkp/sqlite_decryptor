@@ -1,7 +1,9 @@
-from flask import jsonify
-from sqlalchemy import create_engine, Column, Integer
+from flask import jsonify, abort
+from sqlalchemy import create_engine, Column, Integer, Table
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker, scoped_session
+
+from app.api import column_types
 
 
 class DatabaseInformation:
@@ -63,11 +65,23 @@ class DatabaseInformation:
         self.db = None
         self.Base = None
 
-    def get_tables(self, entity_name):
+    def get_tables(self):
+        return self.db.table_names()
+
+    def get_table(self, entity_name):
         return self.Base.metadata.tables.get(entity_name)
 
     def add_table(self, name: str, columns: list):
-        pass
+        new_table = Table(name, self.Base.metadata)
+        for i in columns:
+            if not all([i.get('column_name'), i.get('column_type'), i.get('primary_key'), i.get('nullable')]):
+                abort(400, 'Columns includes name, type, primary key and nullable.')
+            if (sql_type := column_types.get(i.get('column_type'))) is None:
+                abort(400, f'Type must be {list(column_types.keys())}.')
+            col = Column(i.get('column_name'), sql_type,
+                         primary_key=i.get('primary_key'), nullable=i.get('nullable'))
+            new_table.append_column(col)
+        new_table.create(bind=self.db)
 
     def delete_table(self, name: str, columns: list):
         pass

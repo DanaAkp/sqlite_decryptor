@@ -18,23 +18,14 @@ class ModelsController(Resource):
         """Возвращает список сущностей базы данных."""
         if db_info.db is None:
             abort(500, 'Database file does not uploaded yet.')
-        entities = db_info.db.table_names()
-        return jsonify(json_list=entities)
+        return db_info.get_tables()
 
     def post(self):
         """Метод для создания новых таблиц."""
         check_body_request(['table_name', 'columns'])
         json_data = request.get_json()
-        new_table = Table(json_data.get('table_name'), db_info.Base.metadata)
-        for i in json_data.get('columns'):
-            if not all([i.get('column_name'), i.get('column_type'), i.get('primary_key'), i.get('nullable')]):
-                abort(400, 'Columns includes name, type, primary key and nullable.')
-            if (sql_type := column_types.get(i.get('column_type'))) is None:
-                abort(400, f'Type must be {list(column_types.keys())}.')
-            col = Column(i.get('column_name'), sql_type,
-                         primary_key=i.get('primary_key'), nullable=i.get('nullable'))
-            new_table.append_column(col)
-        new_table.create(bind=db_info.db)
+        db_info.add_table(json_data.get('table_name'), json_data.get('columns'))
+
         return {'result': True}
 
     def delete(self, name_table):
