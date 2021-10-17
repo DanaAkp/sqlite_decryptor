@@ -46,6 +46,9 @@ class DatabaseInformation:
     def add_column(self, entity_name: str, column: dict):
         pass
 
+    def delete_column(self, entity_name: str, column: str):
+        pass
+
     def get_primary_key(self, entity_name: str):
         columns = self.Base.metadata.tables.get(entity_name).primary_key.columns.keys()
         if columns and len(columns) == 1:
@@ -67,6 +70,12 @@ class DatabaseInformation:
         pass
 
     def delete_table(self, name: str, columns: list):
+        pass
+
+    def get_rows(self, entity: str):
+        pass
+
+    def get_row(self, entity: str, pk: object):
         pass
 
     def add_row(self, entity_name: str, attr: list):
