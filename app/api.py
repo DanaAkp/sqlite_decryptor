@@ -86,38 +86,23 @@ class PrimaryKeyController(Resource):
         return db_info.get_primary_key(entity_name)
 
 
+@api.route('/models/<string:entity_name>', methods=['POST'])
 @api.route('/models/<string:entity_name>/<entity_id>', methods=['GET', 'PUT', 'DELETE'])
 class ObjectEntityController(Resource):
     def get(self, entity_name, entity_id):
         """Метод для получения записи таблицы по ее идентификатору."""
-        entity = db_info.get_tables(entity_name)
-        primary_key = db_info.get_primary_key(entity_name)
-        object_ = db_info.session.query(entity).filter(primary_key == entity_id).first()
-        return serializer(object_, db_info.get_columns(entity_name))
+        return db_info.get_row(entity_name, entity_id)
+
+    def post(self, entity_name):
+        return db_info.add_row()
 
     def put(self, entity_name, entity_id):
         """Метод для обновления записи таблицы по ее идентификатору."""
-        attributes = db_info.get_columns(entity_name)
-        check_body_request(attributes)
-        entity = db_info.get_tables(entity_name)
-        primary_key = db_info.get_primary_key(entity_name)
-        object_ = db_info.session.query(entity).filter(primary_key == entity_id).first()
-        for i in attributes:
-            try:
-                setattr(object_, i, request.json[i])
-            except:
-                continue
-        db_info.session.commit()
-
-        return serializer(object_, attributes)
+        return db_info.change_row(entity_name, entity_id)
 
     def delete(self, entity_name, entity_id):
         """Метод для удаления записи таблицы по ее идентификатору."""
-        entity = db_info.get_tables(entity_name)
-        primary_key = db_info.get_primary_key(entity_name)
-        object_ = db_info.session.query(entity).filter(primary_key == entity_id).first()
-        db_info.session.delete(object_)
-        db_info.session.commit()
+        db_info.delete_row(entity_name, entity_id)
         return {'result': True}
 
 
@@ -166,18 +151,7 @@ class ColumnsController(Resource):
     def post(self, table_name):
         # TODO проверить
         """Метод для добавления новых колонок в таблицу"""
-        if not db_info.db.has_table(table_name):
-            abort(400, f'Table {table_name} not found.')
-
-        check_body_request(['column_name', 'column_type'])
-        json_data = request.get_json()
-
-        if (sql_type := column_types.get(json_data.get('column_type'))) is None:
-            abort(400, f'Type must be {list(column_types.keys())}.')
-
-        new_column = Column(json_data.get('column_name'), sql_type)
-        table = db_info.get_tables(table_name)
-        table.append_column(new_column)
+        db_info.add_column(table_name)
         return {'result': True}, 201
 
     # TODO
@@ -199,10 +173,7 @@ class ColumnsController(Resource):
     def delete(self, table_name, column_name):
         # TODO
         """Метод для удаления колонки таблицы."""
-        if not db_info.db.has_table(table_name):
-            abort(400, f'Table {table_name} not found.')
-
-        table = db_info.get_tables(table_name)
+        db_info.delete_column(table_name, column_name)
         return {'result': True}
 
 

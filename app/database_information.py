@@ -4,6 +4,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 from app.api import column_types
+from app.utils import serializer
 
 
 class DatabaseInformation:
@@ -46,10 +47,24 @@ class DatabaseInformation:
         return sorted(list(map(lambda x: x.get('name'), columns)))
 
     def add_column(self, entity_name: str, column: dict):
-        pass
+        if not self.db.has_table(entity_name):
+            abort(400, f'Table {entity_name} not found.')
+
+        check_body_request(['column_name', 'column_type'])
+        json_data = request.get_json()
+
+        if (sql_type := column_types.get(json_data.get('column_type'))) is None:
+            abort(400, f'Type must be {list(column_types.keys())}.')
+
+        new_column = Column(json_data.get('column_name'), sql_type)
+        table = self.get_tables(entity_name)
+        table.append_column(new_column)
 
     def delete_column(self, entity_name: str, column: str):
-        pass
+        if not self.db.has_table(entity_name):
+            abort(400, f'Table {entity_name} not found.')
+
+        table = self.get_tables(entity_name)
 
     def get_primary_key(self, entity_name: str):
         columns = self.Base.metadata.tables.get(entity_name).primary_key.columns.keys()
@@ -90,7 +105,10 @@ class DatabaseInformation:
         pass
 
     def get_row(self, entity: str, pk: object):
-        pass
+        entity = self.get_tables(entity)
+        primary_key = self.get_primary_key(entity)
+        obj = self.session.query(entity).filter(primary_key == pk).first()
+        return serializer(obj, self.get_columns(entity))
 
     def add_row(self, entity_name: str, attr: list):
         # todo
@@ -102,5 +120,24 @@ class DatabaseInformation:
         # ins = entity.insert().values(at)
         # db_info.db.execute(ins)
 
+    def change_row(self, entity_name: str, pk: object):
+        attributes = self.get_columns(entity_name)
+        check_body_request(attributes)
+        entity = self.get_tables(entity_name)
+        primary_key = self.get_primary_key(entity_name)
+        object_ = self.session.query(entity).filter(primary_key == pk).first()
+        for i in attributes:
+            try:
+                setattr(object_, i, request.json[i])
+            except:
+                continue
+        self.session.commit()
+
+        return serializer(object_, attributes)
+
     def delete_row(self, entity_name: str, pk: object):
-        pass
+        entity = self.get_tables(entity_name)
+        primary_key = self.get_primary_key(entity_name)
+        object_ = self.session.query(entity).filter(primary_key == pk).first()
+        self.session.delete(object_)
+        self.session.commit()
