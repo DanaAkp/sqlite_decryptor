@@ -1,20 +1,13 @@
-from flask import jsonify, abort
+from flask import jsonify, abort, request
 from sqlalchemy import create_engine, Column, Integer, Table
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 from app.api import column_types
-from app.utils import serializer
+from app.utils import serializer, check_body_request
 
 
 class DatabaseInformation:
-    def __init__(self):
-        self._session = None
-        self._database_file = None
-        self._password = None
-        self.db = None
-        self.Base = None
-
     @property
     def session(self):
         return self._session
@@ -41,14 +34,22 @@ class DatabaseInformation:
         with open('test.db', 'rb') as file:
             return file.read()
 
-    def get_columns(self, entity_name: str):
-        """Возвращает набор полей данной сущности"""
-        columns = list(map(lambda x: x, self.db.dialect.get_columns(self.db.connect(), entity_name)))
+    def clear_db(self):
+        self._session = None
+        self._password = None
+        self._database_file = None
+        self.db = None
+        self.Base = None
+
+    # region Column
+    def get_columns(self, table_name: str):
+        """Возвращает отсортированный список полей данной таблицы"""
+        columns = list(map(lambda x: x, self.db.dialect.get_columns(self.db.connect(), table_name)))
         return sorted(list(map(lambda x: x.get('name'), columns)))
 
-    def add_column(self, entity_name: str, column: dict):
-        if not self.db.has_table(entity_name):
-            abort(400, f'Table {entity_name} not found.')
+    def add_column(self, table_name: str):
+        if not self.db.has_table(table_name):
+            abort(400, f'Table {table_name} not found.')
 
         check_body_request(['column_name', 'column_type'])
         json_data = request.get_json()
@@ -57,37 +58,37 @@ class DatabaseInformation:
             abort(400, f'Type must be {list(column_types.keys())}.')
 
         new_column = Column(json_data.get('column_name'), sql_type)
-        table = self.get_tables(entity_name)
+        table = self.get_table(table_name)
         table.append_column(new_column)
 
-    def delete_column(self, entity_name: str, column: str):
-        if not self.db.has_table(entity_name):
-            abort(400, f'Table {entity_name} not found.')
+    def delete_column(self, table_name: str, column: str):
+        if not self.db.has_table(table_name):
+            abort(400, f'Table {table_name} not found.')
 
-        table = self.get_tables(entity_name)
+        table = self.get_table(table_name)
+        table.delete_column(column)  # TODO change column type
 
-    def get_primary_key(self, entity_name: str):
-        columns = self.Base.metadata.tables.get(entity_name).primary_key.columns.keys()
+    def get_primary_key(self, table_name: str):
+        """Возвращает название ключевого поля, если оно есть и лист в противном случае."""
+        columns = self.Base.metadata.tables.get(table_name).primary_key.columns.keys()
         if columns and len(columns) == 1:
             return {'primary_key': columns[0]}
         else:
             return list(self.db.table_names())
+    # endregion
 
-    def clear_db(self):
-        self._session = None
-        self._password = None
-        self._database_file = None
-        self.db = None
-        self.Base = None
-
+    # region Table
     def get_tables(self):
+        """Возвращает список имен всех таблиц."""
         return self.db.table_names()
 
-    def get_table(self, entity_name):
-        return self.Base.metadata.tables.get(entity_name)
+    def get_table(self, table_name):
+        """Возвращает таблицу базы данных, с которой можно проводить операции добавления и удаления полей."""
+        return self.Base.metadata.tables.get(table_name)
 
-    def add_table(self, name: str, columns: list):
-        new_table = Table(name, self.Base.metadata)
+    def add_table(self, table_name: str, columns: list):
+        """Метод для добавления новой таблицы в базу данных."""
+        new_table = Table(table_name, self.Base.metadata)
         for i in columns:
             if not all([i.get('column_name'), i.get('column_type'), i.get('primary_key'), i.get('nullable')]):
                 abort(400, 'Columns includes name, type, primary key and nullable.')
@@ -98,33 +99,38 @@ class DatabaseInformation:
             new_table.append_column(col)
         new_table.create(bind=self.db)
 
-    def delete_table(self, name: str, columns: list):
+    def delete_table(self, table_name: str):
+        pass
+    # endregion
+
+    # region Rows
+    def get_rows(self, table_name: str):
+        """Возвращает все записи данной таблицы."""
         pass
 
-    def get_rows(self, entity: str):
-        pass
+    def get_row(self, table_name: str, pk: object):
+        """Возвращает одну записи данной таблицы по ее ключевому полю."""
+        table_name = self.get_tables(table_name)
+        primary_key = self.get_primary_key(table_name)
+        obj = self.session.query(table_name).filter(primary_key == pk).first()
+        return serializer(obj, self.get_columns(table_name))
 
-    def get_row(self, entity: str, pk: object):
-        entity = self.get_tables(entity)
-        primary_key = self.get_primary_key(entity)
-        obj = self.session.query(entity).filter(primary_key == pk).first()
-        return serializer(obj, self.get_columns(entity))
-
-    def add_row(self, entity_name: str, attr: list):
+    def add_row(self, table_name: str, values: list):
         # todo
-        entity = self.get_tables(entity_name)
-        attributes = self.get_columns(entity_name)
+        entity = self.get_tables(table_name)
+        attributes = self.get_columns(table_name)
         at = dict()
         # for i in attributes:
         #     at[i] = request.json[i]
         # ins = entity.insert().values(at)
         # db_info.db.execute(ins)
 
-    def change_row(self, entity_name: str, pk: object):
-        attributes = self.get_columns(entity_name)
+    def change_row(self, table_name: str, pk: object):
+        """Метод для изменения записи данной таблицы по ее ключевому полю."""
+        attributes = self.get_columns(table_name)
         check_body_request(attributes)
-        entity = self.get_tables(entity_name)
-        primary_key = self.get_primary_key(entity_name)
+        entity = self.get_tables(table_name)
+        primary_key = self.get_primary_key(table_name)
         object_ = self.session.query(entity).filter(primary_key == pk).first()
         for i in attributes:
             try:
@@ -135,9 +141,10 @@ class DatabaseInformation:
 
         return serializer(object_, attributes)
 
-    def delete_row(self, entity_name: str, pk: object):
-        entity = self.get_tables(entity_name)
-        primary_key = self.get_primary_key(entity_name)
+    def delete_row(self, table_name: str, pk: object):
+        entity = self.get_tables(table_name)
+        primary_key = self.get_primary_key(table_name)
         object_ = self.session.query(entity).filter(primary_key == pk).first()
         self.session.delete(object_)
         self.session.commit()
+    # endregion
