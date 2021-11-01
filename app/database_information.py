@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, Column, Integer, Table
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-from app.api import column_types
+from app.rest_api import column_types
 from app.utils import serializer, check_body_request
 
 

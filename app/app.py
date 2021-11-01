@@ -23,6 +23,6 @@ bootstrap = Bootstrap(app)
 db_info = DatabaseInformation()
 
 
-from app.api import *
+from app.rest_api import *
 from app.views import *
 
