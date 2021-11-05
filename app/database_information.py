@@ -1,10 +1,13 @@
-from flask import jsonify, abort, request
-from sqlalchemy import create_engine, Column, Integer, Table
+from flask import abort, request
+from sqlalchemy import create_engine, Column, Table, Integer, String, Text, Date, DateTime, Boolean, BINARY
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-from app.rest_api import column_types
 from app.utils import serializer, check_body_request
+
+
+column_types = {'int': Integer, 'str': String, 'date_time': DateTime, 'date': Date, 'bool': Boolean,
+                'bin': BINARY, 'text': Text}
 
 
 class DatabaseInformation:

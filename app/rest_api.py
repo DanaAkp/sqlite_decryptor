@@ -1,14 +1,9 @@
 from flask import jsonify, request, abort
 from flask_restx import Resource
 
-from app.app import api, app, db_info
+from app.app import api, db_info
 from app.aes.aes import AES
 from app.utils import check_body_request, serializer
-from sqlalchemy import Table, Column, Integer, String, Text, Date, DateTime, Boolean, BINARY
-
-
-column_types = {'int': Integer, 'str': String, 'date_time': DateTime, 'date': Date, 'bool': Boolean,
-                'bin': BINARY, 'text': Text}
 
 
 @api.route('/models', methods=['GET', 'POST'])
