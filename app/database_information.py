@@ -1,4 +1,4 @@
-from flask import abort, request
+from flask import abort
 from sqlalchemy import create_engine, Column, Table, Integer, String, Text, Date, DateTime, Boolean, BINARY
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -50,12 +50,7 @@ class DatabaseInformation:
         columns = list(map(lambda x: x, self.db.dialect.get_columns(self.db.connect(), table_name)))
         return sorted(list(map(lambda x: x.get('name'), columns)))
 
-    def add_column(self, table_name: str):
-        if not self.db.has_table(table_name):
-            abort(400, f'Table {table_name} not found.')
-
-        check_body_request(['column_name', 'column_type'])
-        json_data = request.get_json()
+    def add_column(self, table_name: str, json_data: dict):
 
         if (sql_type := column_types.get(json_data.get('column_type'))) is None:
             abort(400, f'Type must be {list(column_types.keys())}.')
@@ -77,7 +72,7 @@ class DatabaseInformation:
         if columns and len(columns) == 1:
             return {'primary_key': columns[0]}
         else:
-            return list(self.db.table_names())
+            return list(map(lambda x: x.name, self.Base.metadata.tables.get(table_name).columns))
     # endregion
 
     # region Table
@@ -128,7 +123,7 @@ class DatabaseInformation:
         # ins = entity.insert().values(at)
         # db_info.db.execute(ins)
 
-    def change_row(self, table_name: str, pk: object):
+    def change_row(self, table_name: str, pk: object, json_data: dict):
         """Метод для изменения записи данной таблицы по ее ключевому полю."""
         attributes = self.get_columns(table_name)
         check_body_request(attributes)
@@ -137,7 +132,7 @@ class DatabaseInformation:
         object_ = self.session.query(entity).filter(primary_key == pk).first()
         for i in attributes:
             try:
-                setattr(object_, i, request.json[i])
+                setattr(object_, i, json_data[i])
             except:
                 continue
         self.session.commit()

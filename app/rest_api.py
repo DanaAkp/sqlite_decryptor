@@ -93,7 +93,8 @@ class ObjectEntityController(Resource):
 
     def put(self, entity_name, entity_id):
         """Метод для обновления записи таблицы по ее идентификатору."""
-        return db_info.change_row(entity_name, entity_id)
+        json_data = request.get_json()
+        return db_info.change_row(entity_name, entity_id, json_data)
 
     def delete(self, entity_name, entity_id):
         """Метод для удаления записи таблицы по ее идентификатору."""
@@ -146,7 +147,12 @@ class ColumnsController(Resource):
     def post(self, table_name):
         # TODO проверить
         """Метод для добавления новых колонок в таблицу"""
-        db_info.add_column(table_name)
+        if not self.db.has_table(table_name):
+            abort(400, f'Table {table_name} not found.')
+
+        check_body_request(['column_name', 'column_type'])
+        json_data = request.get_json()
+        db_info.add_column(table_name, json_data)
         return {'result': True}, 201
 
     # TODO
