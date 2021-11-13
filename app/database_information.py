@@ -69,9 +69,9 @@ class DatabaseInformation:
 
     def get_primary_key(self, table_name: str):
         """Возвращает название ключевого поля, если оно есть и лист в противном случае."""
-        columns = self.Base.metadata.tables.get(table_name).primary_key.columns.keys()
+        columns = self.get_table(table_name).primary_key.columns.keys()
         if columns and len(columns) == 1:
-            return {'primary_key': columns[0]}
+            return columns[0]
         else:
             return list(map(lambda x: x.name, self.Base.metadata.tables.get(table_name).columns))
     # endregion
@@ -89,7 +89,7 @@ class DatabaseInformation:
         """Метод для добавления новой таблицы в базу данных."""
         new_table = Table(table_name, self.Base.metadata)
         for i in columns:
-            if not all([i.get('column_name'), i.get('column_type'), i.get('primary_key'), i.get('nullable')]):
+            if not all([i.get('column_name'), i.get('column_type')]):
                 abort(400, 'Columns includes name, type, primary key and nullable.')
             if (sql_type := column_types.get(i.get('column_type'))) is None:
                 abort(400, f'Type must be {list(column_types.keys())}.')
@@ -99,8 +99,7 @@ class DatabaseInformation:
         new_table.create(bind=self.db)
 
     def delete_table(self, table_name: str):
-        metadata = MetaData(self.db, reflect=True)
-        table = metadata.tables.get(table_name)
+        table = self.Base.metadata.tables.get(table_name)
         if table is not None:
             self.Base.metadata.drop_all(self.db, [table], checkfirst=True)
     # endregion
@@ -112,20 +111,20 @@ class DatabaseInformation:
 
     def get_row(self, table_name: str, pk: object):
         """Возвращает одну записи данной таблицы по ее ключевому полю."""
-        table_name = self.get_tables(table_name)
+        table = self.get_table(table_name)
         primary_key = self.get_primary_key(table_name)
-        obj = self.session.query(table_name).filter(primary_key == pk).first()
+        obj = self.session.query(table).filter(primary_key == pk).first()
         return serializer(obj, self.get_columns(table_name))
 
     def add_row(self, table_name: str, values: list):
         # todo
-        entity = self.get_tables(table_name)
+        entity = self.get_table(table_name)
         attributes = self.get_columns(table_name)
         at = dict()
         # for i in attributes:
         #     at[i] = request.json[i]
-        # ins = entity.insert().values(at)
-        # db_info.db.execute(ins)
+        ins = entity.insert().values(values)
+        self.db.execute(ins)
 
     def change_row(self, table_name: str, pk: object, json_data: dict):
         """Метод для изменения записи данной таблицы по ее ключевому полю."""
