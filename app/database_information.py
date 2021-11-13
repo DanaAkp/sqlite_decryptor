@@ -1,5 +1,5 @@
 from flask import abort
-from sqlalchemy import create_engine, Column, Table, Integer, String, Text, Date, DateTime, Boolean, BINARY
+from sqlalchemy import create_engine, Column, Table, Integer, String, Text, Date, DateTime, Boolean, BINARY, MetaData
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
@@ -51,20 +51,21 @@ class DatabaseInformation:
         return sorted(list(map(lambda x: x.get('name'), columns)))
 
     def add_column(self, table_name: str, json_data: dict):
-
         if (sql_type := column_types.get(json_data.get('column_type'))) is None:
             abort(400, f'Type must be {list(column_types.keys())}.')
 
         new_column = Column(json_data.get('column_name'), sql_type)
-        table = self.get_table(table_name)
-        table.append_column(new_column)
+        column_name = new_column.compile(dialect=self.db.dialect)
+        column_type = new_column.type.compile(self.db.dialect)
+        self.db.execute('ALTER TABLE %s ADD COLUMN %s %s' % (table_name, column_name, column_type))
+        # table = self.get_table(table_name)
+        # table.append_column(new_column)
 
     def delete_column(self, table_name: str, column: str):
         if not self.db.has_table(table_name):
             abort(400, f'Table {table_name} not found.')
 
-        table = self.get_table(table_name)
-        table.delete_column(column)  # TODO change column type
+        self.db.execute(f'ALTER TABLE {table_name} DROP COLUMN {column}')
 
     def get_primary_key(self, table_name: str):
         """Возвращает название ключевого поля, если оно есть и лист в противном случае."""
@@ -98,7 +99,10 @@ class DatabaseInformation:
         new_table.create(bind=self.db)
 
     def delete_table(self, table_name: str):
-        pass
+        metadata = MetaData(self.db, reflect=True)
+        table = metadata.tables.get(table_name)
+        if table is not None:
+            self.Base.metadata.drop_all(self.db, [table], checkfirst=True)
     # endregion
 
     # region Rows
@@ -136,6 +140,7 @@ class DatabaseInformation:
             except:
                 continue
         self.session.commit()
+        # SESSION.query(students).filter(Student.Name == 'Sam').update({'AGE': None})
 
         return serializer(object_, attributes)
 
