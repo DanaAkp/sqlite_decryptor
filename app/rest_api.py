@@ -93,6 +93,8 @@ class ObjectEntityController(Resource):
 
     def put(self, entity_name, entity_id):
         """Метод для обновления записи таблицы по ее идентификатору."""
+        attributes = self.get_columns(entity_name)
+        check_body_request(attributes)
         json_data = request.get_json()
         return db_info.change_row(entity_name, entity_id, json_data)
 

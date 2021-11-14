@@ -116,6 +116,8 @@ class DatabaseInformation:
         table = self.get_table(table_name)
         primary_key = self.get_primary_key(table_name)
         obj = self.session.query(table).filter(primary_key == pk).first()
+        if obj is None:
+            return None
         return serializer(obj, self.get_columns(table_name))
 
     def add_row(self, table_name: str, values: list):
@@ -124,19 +126,17 @@ class DatabaseInformation:
 
     def change_row(self, table_name: str, pk: object, json_data: dict):
         """Метод для изменения записи данной таблицы по ее ключевому полю."""
-        attributes = self.get_columns(table_name)
-        check_body_request(attributes)
         entity = self.get_table(table_name)
         primary_key = self.get_primary_key(table_name)
         self.session.query(entity).filter(primary_key == pk).update(json_data)
         self.session.commit()
 
-        return serializer(self.get_row(table_name, pk), self.get_columns(table_name))
+        return self.get_row(table_name, pk)
 
     def delete_row(self, table_name: str, pk: object):
-        entity = self.get_tables(table_name)
+        entity = self.get_table(table_name)
         primary_key = self.get_primary_key(table_name)
-        object_ = self.session.query(entity).filter(primary_key == pk).first()
-        self.session.delete(object_)
+        self.session.query(entity).filter(primary_key == pk).delete()
+        # self.session.delete(object_)
         self.session.commit()
     # endregion
