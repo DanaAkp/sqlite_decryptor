@@ -78,7 +78,7 @@ class AttributesController(Resource):
 class PrimaryKeyController(Resource):
     def get(self, entity_name):
         """Возвращает название ключевого поля."""
-        return db_info.get_primary_key(entity_name)
+        return {'primary_key': db_info.get_primary_key(entity_name).name}
 
 
 @api.route('/models/<string:entity_name>', methods=['POST'])

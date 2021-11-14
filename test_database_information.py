@@ -28,7 +28,9 @@ def upload_db():
 
 
 def test_get_primary_key(upload_db):
-    assert db_info.get_primary_key(table_name)
+    buf = db_info.get_primary_key(table_name).name
+    print(buf)
+    assert buf
 
 
 @pytest.mark.dependency

@@ -69,7 +69,7 @@ class DatabaseInformation:
 
     def get_primary_key(self, table_name: str):
         """Возвращает название ключевого поля, если оно есть и лист в противном случае."""
-        columns = self.get_table(table_name).primary_key.columns.keys()
+        columns = self.get_table(table_name).primary_key.columns
         if columns and len(columns) == 1:
             return columns[0]
         else:
@@ -107,7 +107,9 @@ class DatabaseInformation:
     # region Rows
     def get_rows(self, table_name: str):
         """Возвращает все записи данной таблицы."""
-        pass
+        table = self.get_table(table_name)
+        objects = self.session.query(table).all()
+        return [serializer(obj, self.get_columns(table_name)) for obj in objects]
 
     def get_row(self, table_name: str, pk: object):
         """Возвращает одну записи данной таблицы по ее ключевому полю."""
@@ -117,31 +119,19 @@ class DatabaseInformation:
         return serializer(obj, self.get_columns(table_name))
 
     def add_row(self, table_name: str, values: list):
-        # todo
         entity = self.get_table(table_name)
-        attributes = self.get_columns(table_name)
-        at = dict()
-        # for i in attributes:
-        #     at[i] = request.json[i]
-        ins = entity.insert().values(values)
-        self.db.execute(ins)
+        self.db.execute(entity.insert().values(values))
 
     def change_row(self, table_name: str, pk: object, json_data: dict):
         """Метод для изменения записи данной таблицы по ее ключевому полю."""
         attributes = self.get_columns(table_name)
         check_body_request(attributes)
-        entity = self.get_tables(table_name)
+        entity = self.get_table(table_name)
         primary_key = self.get_primary_key(table_name)
-        object_ = self.session.query(entity).filter(primary_key == pk).first()
-        for i in attributes:
-            try:
-                setattr(object_, i, json_data[i])
-            except:
-                continue
+        self.session.query(entity).filter(primary_key == pk).update(json_data)
         self.session.commit()
-        # SESSION.query(students).filter(Student.Name == 'Sam').update({'AGE': None})
 
-        return serializer(object_, attributes)
+        return serializer(self.get_row(table_name, pk), self.get_columns(table_name))
 
     def delete_row(self, table_name: str, pk: object):
         entity = self.get_tables(table_name)
