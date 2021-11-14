@@ -11,6 +11,9 @@ column_types = {'int': Integer, 'str': String, 'date_time': DateTime, 'date': Da
 
 
 class DatabaseInformation:
+    def __init__(self):
+        self.db = None
+
     @property
     def session(self):
         return self._session
@@ -117,7 +120,7 @@ class DatabaseInformation:
         primary_key = self.get_primary_key(table_name)
         obj = self.session.query(table).filter(primary_key == pk).first()
         if obj is None:
-            return None
+            abort(404, f'Not found this object.')
         return serializer(obj, self.get_columns(table_name))
 
     def add_row(self, table_name: str, values: list):

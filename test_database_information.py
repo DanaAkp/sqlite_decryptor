@@ -76,3 +76,12 @@ def test_update_record():
 def test_delete_record():
     db_info.delete_row(table_name, new_record[0])
     assert not db_info.get_row(table_name, new_record[0])
+
+
+def test_get_tables():
+    print(db_info.get_tables())
+    assert '\n' not in db_info.get_tables()
+
+
+def test_get_columns():
+    pass
