@@ -4,6 +4,7 @@ function add_new_table() {
     let columns = []
     for(let i in rows){
         let input = rows[i].children
+        console.log(input[0])
         let col = {
             'column_name': input[0],
             'column_type': input[1],
@@ -16,7 +17,6 @@ function add_new_table() {
 }
 
 function add_column_input() {
-    // TODO добавить новую колонку с инпутом в таблицу, чтобы пользователь мог добавить колонок, сколько ему нужно
     let tbody = document.getElementById('tbody-columns')
 
     let row = document.createElement('tr')
