@@ -16,9 +16,8 @@ sqlalchemy_type = {Integer: int, String: str, Date: datetime.date, DateTime: dat
 
 
 class DatabaseInformation:
-    def __init__(self, sqlite=True):
+    def __init__(self):
         self.db = None
-        self.sqlite = sqlite
 
     @property
     def session(self):
@@ -29,13 +28,10 @@ class DatabaseInformation:
         db_file, password = value
         self._password = password
         self._database_file = db_file
-        # TODO добавить без создания файла или удалять его после использования
-        if self.sqlite is False:
-            self.db = create_engine(f'postgresql://postgres:3sop3MK75qepDP0cLPd5@localhost/db_decryptor')
-        else:
-            with open('test.db', 'wb') as file:
-                file.write(db_file)
-            self.db = create_engine('sqlite:///test.db')
+
+        with open('test.db', 'wb') as file:
+            file.write(db_file)
+        self.db = create_engine('sqlite:///test.db')
         self.Base = automap_base()
         self.Base.prepare(self.db, reflect=True)
 

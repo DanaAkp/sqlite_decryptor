@@ -23,7 +23,8 @@
         </div>
     </div>
     <script>
-    fill_entity_list();
+        fill_entity_list();
+
         function fill_entity_list() {
             const request = new XMLHttpRequest();
             request.open('GET', '/api/models', false);
@@ -38,13 +39,27 @@
                     let list_item = document.createElement('li');
                     let a = document.createElement('a');
                     a.href = `/sql_decrypter/${json[i]}`;
-                    a.textContent = json[i];
+                    a.textContent = capitalize(json[i]);
 
                     list_item.appendChild(a);
                     u_list.appendChild(list_item);
                     entity_list.appendChild(u_list);
                 }
+                let u_list = document.createElement('ul');
+                u_list.className = "nav navbar-nav";
+                let list_item = document.createElement('li');
+                let a = document.createElement('a');
+                a.href = `/sql_decrypter/add_new_table`;
+                a.textContent = 'New table';
+
+                list_item.appendChild(a);
+                u_list.appendChild(list_item);
+                entity_list.appendChild(u_list);
             }
+        }
+
+        function capitalize(s) {
+            return s[0].toUpperCase() + s.slice(1);
         }
     </script>
 {% endblock %}
