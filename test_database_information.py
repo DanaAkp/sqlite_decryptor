@@ -73,6 +73,12 @@ def test_update_record():
 
 
 @pytest.mark.dependency
+def test_get_all_records():
+    buf = db_info.get_rows(table_name=table_name)
+    assert len(buf) > 1
+
+
+@pytest.mark.dependency
 def test_delete_record():
     db_info.delete_row(table_name, new_record[0])
     assert not db_info.get_row(table_name, new_record[0])
@@ -85,9 +91,3 @@ def test_get_tables():
 
 def test_get_columns():
     pass
-
-
-@pytest.mark.dependency
-def test_get_all_records():
-    buf = db_info.get_rows(table_name=table_name)
-    assert len(buf) > 1

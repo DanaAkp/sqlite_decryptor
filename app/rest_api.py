@@ -77,8 +77,9 @@ class PrimaryKeyController(Resource):
 class ObjectEntityController(Resource):
     def get(self, entity_name, entity_id):
         """Метод для получения записи таблицы по ее идентификатору."""
-        ob = db_info.get_row(entity_name, entity_id)
-        return ob
+        if ob := db_info.get_row(entity_name, entity_id):
+            return ob
+        abort(404, f'Not found this object.')
 
     def post(self, entity_name):
         """Метод для добавлени новой записи в таблицу."""

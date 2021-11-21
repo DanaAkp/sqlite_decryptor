@@ -5,7 +5,6 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 
 from app.utils import serializer, check_body_request
 
-
 column_types = {'int': Integer, 'str': String, 'date_time': DateTime, 'date': Date, 'bool': Boolean,
                 'bin': BINARY, 'text': Text}
 
@@ -77,6 +76,7 @@ class DatabaseInformation:
             return columns[0]
         else:
             return list(map(lambda x: x.name, self.Base.metadata.tables.get(table_name).columns))
+
     # endregion
 
     # region Table
@@ -105,6 +105,7 @@ class DatabaseInformation:
         table = self.Base.metadata.tables.get(table_name)
         if table is not None:
             self.Base.metadata.drop_all(self.db, [table], checkfirst=True)
+
     # endregion
 
     # region Rows
@@ -119,10 +120,9 @@ class DatabaseInformation:
         """Возвращает одну записи данной таблицы по ее ключевому полю."""
         table = self.get_table(table_name)
         primary_key = self.get_primary_key(table_name)
-        obj = self.session.query(table).filter(primary_key == pk).first()
-        if obj is None:
-            abort(404, f'Not found this object.')
-        return serializer(obj, self.get_columns(table_name))
+        if obj := self.session.query(table).filter(primary_key == pk).first():
+            return serializer(obj, self.get_columns(table_name))
+        return None
 
     def add_row(self, table_name: str, values: list):
         entity = self.get_table(table_name)
@@ -142,6 +142,5 @@ class DatabaseInformation:
         entity = self.get_table(table_name)
         primary_key = self.get_primary_key(table_name)
         self.session.query(entity).filter(primary_key == pk).delete()
-        # self.session.delete(object_)
         self.session.commit()
     # endregion
