@@ -1,5 +1,8 @@
+import datetime
+
 from flask import abort
-from sqlalchemy import create_engine, Column, Table, Integer, String, Text, Date, DateTime, Boolean, BINARY, MetaData
+from sqlalchemy import create_engine, Column, Table, Integer, String, Text, Date, DateTime, Boolean, BINARY, MetaData, \
+    inspect
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
@@ -7,6 +10,9 @@ from app.utils import serializer, check_body_request
 
 column_types = {'int': Integer, 'str': String, 'date_time': DateTime, 'date': Date, 'bool': Boolean,
                 'bin': BINARY, 'text': Text}
+
+sqlalchemy_type = {Integer: int, String: str, Date: datetime.date, DateTime: datetime.datetime, Boolean: bool,
+                   BINARY: bin, Text: str}
 
 
 class DatabaseInformation:
@@ -34,6 +40,7 @@ class DatabaseInformation:
         self.Base.prepare(self.db, reflect=True)
 
         session = scoped_session(sessionmaker(bind=self.db))
+        self.inspect = inspect(self.db)
 
         self._session = session
 
@@ -109,6 +116,13 @@ class DatabaseInformation:
         if table is not None:
             self.Base.metadata.drop_all(self.db, [table], checkfirst=True)
 
+    def get_column_type(self, table_name, column_name):
+        columns_table = self.inspect.get_columns(table_name)
+        for c in columns_table:
+            if c['name'] == column_name:
+                for t in sqlalchemy_type:
+                    if isinstance(c['type'], t):
+                        return sqlalchemy_type[t]
     # endregion
 
     # region Rows
@@ -136,7 +150,11 @@ class DatabaseInformation:
         """Метод для изменения записи данной таблицы по ее ключевому полю."""
         entity = self.get_table(table_name)
         primary_key = self.get_primary_key(table_name)
-        self.session.query(entity).filter(primary_key == pk).update().values(json_data)
+        for i in json_data:
+            type_ = self.get_column_type(table_name, i)
+            json_data[i] = type_(json_data[i])
+
+        self.session.query(entity).filter(primary_key == pk).update(json_data)
         self.session.commit()
 
         return self.get_row(table_name, pk)
