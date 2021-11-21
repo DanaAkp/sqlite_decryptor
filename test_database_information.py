@@ -3,7 +3,7 @@ import pytest_dependency
 from app.database_information import DatabaseInformation
 from app.aes.aes import AES
 
-db_info = DatabaseInformation()
+db_info = DatabaseInformation(sqlite=False)
 password = b'1234567890123456'
 aes = AES(password)
 new_col = {'column_name': 'new_col', 'column_type': 'str'}
@@ -17,9 +17,9 @@ update_record = {'id': 4, 'name': 'update_row'}
 
 @pytest.fixture
 def upload_db():
-    with open('example.txt') as file:
-        decrypted_file = aes.decrypt(bytes.fromhex(file.read()))
-    db_info.session = (decrypted_file, password)
+    # with open('example.txt') as file:
+    #     decrypted_file = aes.decrypt(bytes.fromhex(file.read()))
+    db_info.session = ('decrypted_file', 'password')
     tables = db_info.get_tables()
     for i in tables:
         print(i)

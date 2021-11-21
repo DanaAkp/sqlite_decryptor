@@ -10,8 +10,9 @@ column_types = {'int': Integer, 'str': String, 'date_time': DateTime, 'date': Da
 
 
 class DatabaseInformation:
-    def __init__(self):
+    def __init__(self, sqlite=True):
         self.db = None
+        self.sqlite = sqlite
 
     @property
     def session(self):
@@ -23,10 +24,12 @@ class DatabaseInformation:
         self._password = password
         self._database_file = db_file
         # TODO добавить без создания файла или удалять его после использования
-        with open('test.db', 'wb') as file:
-            file.write(db_file)
-
-        self.db = create_engine('sqlite:///test.db')
+        if self.sqlite is False:
+            self.db = create_engine(f'postgresql://postgres:3sop3MK75qepDP0cLPd5@localhost/db_decryptor')
+        else:
+            with open('test.db', 'wb') as file:
+                file.write(db_file)
+            self.db = create_engine('sqlite:///test.db')
         self.Base = automap_base()
         self.Base.prepare(self.db, reflect=True)
 
@@ -133,7 +136,7 @@ class DatabaseInformation:
         """Метод для изменения записи данной таблицы по ее ключевому полю."""
         entity = self.get_table(table_name)
         primary_key = self.get_primary_key(table_name)
-        self.session.query(entity).filter(primary_key == pk).update(json_data)
+        self.session.query(entity).filter(primary_key == pk).update().values(json_data)
         self.session.commit()
 
         return self.get_row(table_name, pk)
