@@ -61,3 +61,9 @@ def test_remove_table():
 def test_add_record():
     db_info.add_row(table_name=table_name, values=new_record)
     assert db_info.get_row(table_name, 4)
+
+
+@pytest.mark.dependency
+def test_get_all_records():
+    buf = db_info.get_rows(table_name=table_name)
+    assert len(buf) > 1

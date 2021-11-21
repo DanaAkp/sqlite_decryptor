@@ -107,7 +107,10 @@ class DatabaseInformation:
     # region Rows
     def get_rows(self, table_name: str):
         """Возвращает все записи данной таблицы."""
-        pass
+        table = self.get_table(table_name)
+        objects = self.session.query(table).all()
+        columns = self.get_columns(table_name)
+        return [serializer(obj, columns) for obj in objects]
 
     def get_row(self, table_name: str, pk: object):
         """Возвращает одну записи данной таблицы по ее ключевому полю."""
@@ -117,12 +120,7 @@ class DatabaseInformation:
         return serializer(obj, self.get_columns(table_name))
 
     def add_row(self, table_name: str, values: list):
-        # todo
         entity = self.get_table(table_name)
-        attributes = self.get_columns(table_name)
-        at = dict()
-        # for i in attributes:
-        #     at[i] = request.json[i]
         ins = entity.insert().values(values)
         self.db.execute(ins)
 
