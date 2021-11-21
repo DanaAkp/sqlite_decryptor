@@ -1,4 +1,6 @@
- let entity_name = document.getElementById('entity_name').dataset.geocode;
+let header = document.getElementById('header-id')
+header.textContent = 'Edit ' + capitalize(header.textContent)
+let entity_name = document.getElementById('entity_name').dataset.geocode;
         let id = document.getElementById('entity_id').dataset.geocode;
         let input_attributes = document.getElementById('input-attributes');
 

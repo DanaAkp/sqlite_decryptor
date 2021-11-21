@@ -1,3 +1,5 @@
+let header = document.getElementById('header-id')
+header.textContent = capitalize(header.textContent)
 let entity_name = document.getElementById('entity_name').dataset.geocode;
 create_table();
 

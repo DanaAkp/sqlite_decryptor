@@ -59,6 +59,11 @@
         }
 
         function capitalize(s) {
+            let buf_list = s.split('_')
+            if (buf_list.length === 1) {
+                buf_list = s.split(/(?=[A-Z])/).map(x => x.toLowerCase())
+            }
+            s = buf_list.join(' ').trim()
             return s[0].toUpperCase() + s.slice(1);
         }
     </script>
