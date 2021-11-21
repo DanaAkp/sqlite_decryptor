@@ -13,14 +13,13 @@ class ModelsController(Resource):
         """Возвращает список сущностей базы данных."""
         if db_info.db is None:
             abort(500, 'Database file does not uploaded yet.')
-        return db_info.get_tables()
+        return jsonify(json_list=db_info.get_tables())
 
     def post(self):
         """Метод для создания новых таблиц."""
         check_body_request(['table_name', 'columns'])
         json_data = request.get_json()
         db_info.add_table(json_data.get('table_name'), json_data.get('columns'))
-
         return {'result': True}
 
     def delete(self, name_table):
@@ -36,7 +35,7 @@ class ModelsController(Resource):
 class RecordsController(Resource):
     def get(self, entity_name):
         """Возвращает список записей для данной сущности. """
-        entity = db_info.get_tables(entity_name)
+        entity = db_info.get_table(entity_name)
         attributes = db_info.get_columns(entity_name)
         records = db_info.session.query(entity).all()
         buf = list(map(lambda x: serializer(x, attributes), records))
@@ -46,7 +45,6 @@ class RecordsController(Resource):
         """Метод для добавления новой записи в таблицу."""
         attributes = db_info.get_columns(entity_name)
         check_body_request(attributes)
-
         entity = db_info.Base.classes[entity_name]
         new_object = entity()
         for i in attributes:
@@ -56,13 +54,6 @@ class RecordsController(Resource):
                 continue
         db_info.session.add(new_object)
         db_info.session.commit()
-        # entity = db_info.get_entity(entity_name)
-        # at = dict()
-        # for i in attributes:
-        #     at[i] = request.json[i]
-        # ins = entity.insert().values(at)
-        # db_info.db.execute(ins)
-
         return serializer(new_object, attributes), 201
 
 
@@ -78,7 +69,7 @@ class AttributesController(Resource):
 class PrimaryKeyController(Resource):
     def get(self, entity_name):
         """Возвращает название ключевого поля."""
-        return db_info.get_primary_key(entity_name)
+        return {'primary_key': db_info.get_primary_key(entity_name).name}
 
 
 @api.route('/models/<string:entity_name>', methods=['POST'])
@@ -86,13 +77,21 @@ class PrimaryKeyController(Resource):
 class ObjectEntityController(Resource):
     def get(self, entity_name, entity_id):
         """Метод для получения записи таблицы по ее идентификатору."""
-        return db_info.get_row(entity_name, entity_id)
+        ob = db_info.get_row(entity_name, entity_id)
+        return ob
 
     def post(self, entity_name):
-        return db_info.add_row()
+        """Метод для добавлени новой записи в таблицу."""
+        attr = db_info.get_columns(entity_name)
+        check_body_request(attr)
+        data = request.get_json()
+        json_list = [data[i] for i in attr]
+        return db_info.add_row(entity_name, json_list)
 
     def put(self, entity_name, entity_id):
         """Метод для обновления записи таблицы по ее идентификатору."""
+        attributes = db_info.get_columns(entity_name)
+        check_body_request(attributes)
         json_data = request.get_json()
         return db_info.change_row(entity_name, entity_id, json_data)
 
@@ -136,7 +135,6 @@ class SQLEncryptor(Resource):
             aes = AES(request.json['password'].encode('utf-8'))
             encrypted_file = aes.encrypt(bytes.fromhex(request.json['database_file']))
             return {'encrypted_file': encrypted_file.hex()}
-
         except Exception as ex:
             abort(400, ex.args[0])
 
@@ -145,35 +143,18 @@ class SQLEncryptor(Resource):
 @api.route('/columns/<string:table_name>/<string:column_name>', methods=['PUT', 'DELETE'])
 class ColumnsController(Resource):
     def post(self, table_name):
-        # TODO проверить
         """Метод для добавления новых колонок в таблицу"""
         if not self.db.has_table(table_name):
             abort(400, f'Table {table_name} not found.')
-
         check_body_request(['column_name', 'column_type'])
         json_data = request.get_json()
         db_info.add_column(table_name, json_data)
         return {'result': True}, 201
 
-    # TODO
-    # def put(self, table_name, column_name):
-    #     """Метод для изменения колонки таблицы."""
-    #     if not database_information.db.has_table(table_name):
-    #         abort(400, f'Table {table_name} not found.')
-    #
-    #     check_body_request(['column_name', 'column_type'])
-    #     json_data = request.get_json()
-    #
-    #     if (sql_type := column_types.get(json_data.get('column_type'))) is None:
-    #         abort(400, f'Type must be {list(column_types.keys())}.')
-    #
-    #     table = database_information.classes['Debtors'].__table__
-    #
-    #     return {'result': True}, 201
-
     def delete(self, table_name, column_name):
-        # TODO
         """Метод для удаления колонки таблицы."""
+        if not self.db.has_table(table_name):
+            abort(400, f'Table {table_name} not found.')
         db_info.delete_column(table_name, column_name)
         return {'result': True}
 

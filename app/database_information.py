@@ -11,6 +11,9 @@ column_types = {'int': Integer, 'str': String, 'date_time': DateTime, 'date': Da
 
 
 class DatabaseInformation:
+    def __init__(self):
+        self.db = None
+
     @property
     def session(self):
         return self._session
@@ -69,7 +72,7 @@ class DatabaseInformation:
 
     def get_primary_key(self, table_name: str):
         """Возвращает название ключевого поля, если оно есть и лист в противном случае."""
-        columns = self.get_table(table_name).primary_key.columns.keys()
+        columns = self.get_table(table_name).primary_key.columns
         if columns and len(columns) == 1:
             return columns[0]
         else:
@@ -117,6 +120,8 @@ class DatabaseInformation:
         table = self.get_table(table_name)
         primary_key = self.get_primary_key(table_name)
         obj = self.session.query(table).filter(primary_key == pk).first()
+        if obj is None:
+            abort(404, f'Not found this object.')
         return serializer(obj, self.get_columns(table_name))
 
     def add_row(self, table_name: str, values: list):
@@ -126,25 +131,17 @@ class DatabaseInformation:
 
     def change_row(self, table_name: str, pk: object, json_data: dict):
         """Метод для изменения записи данной таблицы по ее ключевому полю."""
-        attributes = self.get_columns(table_name)
-        check_body_request(attributes)
-        entity = self.get_tables(table_name)
+        entity = self.get_table(table_name)
         primary_key = self.get_primary_key(table_name)
-        object_ = self.session.query(entity).filter(primary_key == pk).first()
-        for i in attributes:
-            try:
-                setattr(object_, i, json_data[i])
-            except:
-                continue
+        self.session.query(entity).filter(primary_key == pk).update(json_data)
         self.session.commit()
-        # SESSION.query(students).filter(Student.Name == 'Sam').update({'AGE': None})
 
-        return serializer(object_, attributes)
+        return self.get_row(table_name, pk)
 
     def delete_row(self, table_name: str, pk: object):
-        entity = self.get_tables(table_name)
+        entity = self.get_table(table_name)
         primary_key = self.get_primary_key(table_name)
-        object_ = self.session.query(entity).filter(primary_key == pk).first()
-        self.session.delete(object_)
+        self.session.query(entity).filter(primary_key == pk).delete()
+        # self.session.delete(object_)
         self.session.commit()
     # endregion

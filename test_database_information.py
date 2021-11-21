@@ -12,6 +12,7 @@ new_table = {'table_name': 'new_table',
              'columns': [{'column_name': 'id', 'column_type': 'int', 'primary_key': 'id', 'nullable': ''},
                          {'column_name': 'name', 'column_type': 'str', 'primary_key': '', 'nullable': False}]}
 new_record = [4, 'role 4']
+update_record = {'id': 4, 'name': 'update_row'}
 
 
 @pytest.fixture
@@ -28,7 +29,9 @@ def upload_db():
 
 
 def test_get_primary_key(upload_db):
-    assert db_info.get_primary_key(table_name)
+    buf = db_info.get_primary_key(table_name).name
+    print(buf)
+    assert buf
 
 
 @pytest.mark.dependency
@@ -60,7 +63,28 @@ def test_remove_table():
 @pytest.mark.dependency
 def test_add_record():
     db_info.add_row(table_name=table_name, values=new_record)
-    assert db_info.get_row(table_name, 4)
+    assert db_info.get_row(table_name, new_record[0])
+
+
+@pytest.mark.dependency
+def test_update_record():
+    db_info.change_row(table_name, new_record[0], update_record)
+    assert db_info.get_row(table_name, new_record[0]).get('name') == update_record.get('name')
+
+
+@pytest.mark.dependency
+def test_delete_record():
+    db_info.delete_row(table_name, new_record[0])
+    assert not db_info.get_row(table_name, new_record[0])
+
+
+def test_get_tables():
+    print(db_info.get_tables())
+    assert '\n' not in db_info.get_tables()
+
+
+def test_get_columns():
+    pass
 
 
 @pytest.mark.dependency
