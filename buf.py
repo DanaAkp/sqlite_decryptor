@@ -7,7 +7,7 @@ def move_table(table, source_meta, dest_meta, source, destination, session):
     for col in insp.columns:
         dest_table.append_column(col)
 
-    dest_table.create(destination, checkfirst=True)
+    dest_table.create(destination)
 
     # select and insert loop
     sel = src_table.select()
@@ -42,3 +42,10 @@ if __name__ == '__main__':
     move_table(table_name, source_meta, dest_meta, source, destination, session)
     entity = dest_meta.tables.get(table_name)
     print()
+
+    file = create_engine('sqlite:///new_test.db')
+    raw_connection_source = destination.raw_connection()
+    raw_connection_destination = file.raw_connection()
+    raw_connection_source.backup(raw_connection_destination.connection)
+    raw_connection_destination.close()
+    file.dispose()
