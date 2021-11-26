@@ -3,7 +3,7 @@ import pytest_dependency
 from app.database_information import DatabaseInformation
 from app.aes.aes import AES
 
-db_info = DatabaseInformation(sqlite=True)
+db_info = DatabaseInformation()
 password = b'1234567890123456'
 aes = AES(password)
 new_col = {'column_name': 'new_col', 'column_type': 'str'}
