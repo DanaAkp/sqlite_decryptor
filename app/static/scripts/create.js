@@ -11,7 +11,7 @@ for (let i in attributes) {
     let paragraph = document.createElement('p');
 
     let label_attribute = document.createElement('label');
-    label_attribute.textContent = attributes[i];
+    label_attribute.textContent = capitalize(attributes[i]);
 
     let input_attribute = document.createElement('input');
     input_attribute.type = 'text';

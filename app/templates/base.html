@@ -3,20 +3,89 @@
 {% block title %}SQLiteDecrypter{% endblock %}
 
 {% block navbar %}
+    <style>/* Меню боковой панели */
+    .sidepanel {
+        height: 250px; /* Укажите высоту */
+        width: 0; /* 0 ширина-измените это с помощью JavaScript */
+        position: fixed; /* Оставаться на месте */
+        top: 0;
+        left: 0;
+        background-color: #111; /* Черный */
+        overflow-x: hidden; /* Отключить горизонтальную прокрутку */
+        padding-top: 60px; /* Поместите содержимое 60px сверху */
+        transition: 0.5s; /* 0.5 секунды эффект перехода для скольжения в боковой панели */
+    }
+
+    /* Боковая панель ссылок */
+    .sidepanel a {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #818181;
+        display: block;
+        transition: 0.3s;
+    }
+
+    /* При наведении курсора мыши на навигационные ссылки измените их цвет */
+    .sidepanel a:hover {
+        color: #f1f1f1;
+    }
+
+    /* Положение и стиль кнопки закрытия (верхний правый угол) */
+    .sidepanel .closebtn {
+        position: absolute;
+        top: 0;
+        {#left: 5px;#}
+        font-size: 36px;
+        {#margin-left: 5px;#}
+    }
+
+    /* Стиль кнопка, которая используется для открытия боковой панели */
+    .openbtn {
+        font-size: 20px;
+        cursor: pointer;
+        background-color: #111;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+    }
+
+    .openbtn:hover {
+        background-color: #444;
+    } </style>
+    <script>/* Установите ширину боковой панели на 250 пикселей (показать его) */
+    function openNav() {
+        document.getElementById("mySidepanel").style.width = "250px";
+    }
+
+    /* Установите ширину боковой панели в 0 (скройте ее) */
+    function closeNav() {
+        document.getElementById("mySidepanel").style.width = "0";
+    } </script>
     <div class="navbar navbar-inverse" role="navigation">
         <div class="container">
             <div class="navbar-header">
+
+    <div id="mySidepanel" class="sidepanel" style="height: 100vh;">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a href="#">Save</a>
+        <a href="#">Save</a>
+        <a href="#">Save</a>
+        <a href="#">Save</a>
+    </div>
+
+    <button class="openbtn" onclick="openNav()">&#9776;</button>
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{{ url_for('home') }}">SQLiteDecrypter</a>
+{#                <a class="navbar-brand" href="{{ url_for('home') }}">SQLiteDecrypter</a>#}
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('home') }}">SQLiteDecrypter</a></li>
                 </ul>
                 <div id="list_entity"></div>
             </div>

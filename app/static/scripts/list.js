@@ -16,7 +16,7 @@ function create_table() {
     let json = JSON.parse(request.response).json_list;
     for (let i in json) {
         let th = document.createElement('th');
-        th.textContent = json[i];
+        th.textContent = capitalize(json[i]);
         t_head.appendChild(th);
     }
     table.appendChild(t_head);
