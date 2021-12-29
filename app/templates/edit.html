@@ -2,6 +2,7 @@
 
 
 {% block page_content %}
+    <link href="../../static/styles/edit.css" rel="stylesheet">
     <h1 id="header-id">{{ entity_name }}</h1>
     <br>
     <div id="input-attributes"></div>
@@ -14,12 +15,7 @@
             background-size: contain;
                width: 30px;
                height: 30px;">
-        <input type="button" onclick="edit_object()"
-               style="background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAABLElEQVRoge2aS26DMBBAX6JE7SHCjRPlFumqu3xulPQWdEGC+Ah7wHY8dedJlkDAzDws2yAAwzCW8AkcgQdQZ2pfwDZU5JhRoNu+Q2V8PZGabq4z8BEjUG6RIBltIotlUov44k3lnS2jVWS2jGaRWTLaRWqadaZl5UjkYuo6KcP4w3iSm1UD69fO2nGidnryf1mkRzEim0x5Q8fYiKU9sotaRZ8qZjDf1HeNnfBJBdwE+UfT9tLpVwtt/cUMdhPRholooxiRKXzz94W0i+KOZq0Kfp3wBUgp8aIS1NGS631EiriOYsaIiWjDRLRhItowEW2YiDYkIive92zlwllH8T3y09mO9SkhlGEd9+7BKZGTMGjq5sJXI9D8MHCgsX5X0dJ2B/YEfLI2jP/IL5JHPVAHHw1/AAAAAElFTkSuQmCC');
-            background-repeat: no-repeat;
-            background-size: contain;
-               width: 30px;
-               height: 30px;">
+        <input type="button" onclick="edit_object()" class="btn_edit">
     </p>
     <script src="../../../static/scripts/edit.js">
 
