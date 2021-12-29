@@ -68,45 +68,11 @@ input_decrypt_file_db.onchange = e => {
     }
 }
 
-function save_file(file_name, url_file) {
-    let a = document.createElement("a");
-    a.style = "display: none";
-    document.body.appendChild(a);
-    a.href = url_file;
-    a.download = file_name;
-    a.click();
-    window.URL.revokeObjectURL(url);
-    a.remove();
-}
-
 
 function to_hex_string(byte_array) {
     return Array.prototype.map.call(byte_array, function (byte) {
         return ('0' + (byte & 0xFF).toString(16)).slice(-2);
     }).join('');
-}
-
-
-function save_encrypted_db_file() {
-    const request = new XMLHttpRequest();
-    request.open('GET', '/api/sql_decrypter', false);
-    request.send();
-
-    let textData = JSON.parse(request.response).encrypted_file;
-    let blobData = new Blob([textData], {type: "text/plain"});
-    let url = window.URL.createObjectURL(blobData);
-    save_file('example.txt', url);
-}
-
-
-function clear_current_db_file() {
-    const request = new XMLHttpRequest();
-    request.open('DELETE', '/api/sql_decrypter', false);
-    request.send();
-    if (request.status === 200) {
-        window.location.reload();
-        alert('The current database file has been cleaned up successfully.')
-    }
 }
 
 

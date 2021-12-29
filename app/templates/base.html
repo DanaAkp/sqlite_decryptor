@@ -3,85 +3,25 @@
 {% block title %}SQLiteDecrypter{% endblock %}
 
 {% block navbar %}
-    <style>/* Меню боковой панели */
-    .sidepanel {
-        height: 250px; /* Укажите высоту */
-        width: 0; /* 0 ширина-измените это с помощью JavaScript */
-        position: fixed; /* Оставаться на месте */
-        top: 0;
-        left: 0;
-        background-color: #111; /* Черный */
-        overflow-x: hidden; /* Отключить горизонтальную прокрутку */
-        padding-top: 60px; /* Поместите содержимое 60px сверху */
-        transition: 0.5s; /* 0.5 секунды эффект перехода для скольжения в боковой панели */
-    }
-
-    /* Боковая панель ссылок */
-    .sidepanel a {
-        padding: 8px 8px 8px 32px;
-        text-decoration: none;
-        font-size: 25px;
-        color: #818181;
-        display: block;
-        transition: 0.3s;
-    }
-
-    /* При наведении курсора мыши на навигационные ссылки измените их цвет */
-    .sidepanel a:hover {
-        color: #f1f1f1;
-    }
-
-    /* Положение и стиль кнопки закрытия (верхний правый угол) */
-    .sidepanel .closebtn {
-        position: absolute;
-        top: 0;
-        {#left: 5px;#}
-        font-size: 36px;
-        {#margin-left: 5px;#}
-    }
-
-    /* Стиль кнопка, которая используется для открытия боковой панели */
-    .openbtn {
-        font-size: 20px;
-        cursor: pointer;
-        background-color: #111;
-        color: white;
-        padding: 10px 15px;
-        border: none;
-    }
-
-    .openbtn:hover {
-        background-color: #444;
-    } </style>
-    <script>/* Установите ширину боковой панели на 250 пикселей (показать его) */
-    function openNav() {
-        document.getElementById("mySidepanel").style.width = "250px";
-    }
-
-    /* Установите ширину боковой панели в 0 (скройте ее) */
-    function closeNav() {
-        document.getElementById("mySidepanel").style.width = "0";
-    } </script>
+    <link href="../../../static/styles/base.css" rel="stylesheet">
     <div class="navbar navbar-inverse" role="navigation">
         <div class="container">
             <div class="navbar-header">
 
-    <div id="mySidepanel" class="sidepanel" style="height: 100vh;">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <a href="#">Save</a>
-        <a href="#">Save</a>
-        <a href="#">Save</a>
-        <a href="#">Save</a>
-    </div>
+                <div id="mySidepanel" class="sidepanel" style="height: 100vh;">
+                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                    <a href="javascript:save_encrypted_db_file()">Save</a>
+                    <a href="javascript:clear_current_db_file()">Clear</a>
+                </div>
 
-    <button class="openbtn" onclick="openNav()">&#9776;</button>
+                <button class="openbtn" onclick="openNav()">&#9776;</button>
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-{#                <a class="navbar-brand" href="{{ url_for('home') }}">SQLiteDecrypter</a>#}
+                {#                <a class="navbar-brand" href="{{ url_for('home') }}">SQLiteDecrypter</a>#}
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -91,51 +31,7 @@
             </div>
         </div>
     </div>
-    <script>
-        fill_entity_list();
-
-        function fill_entity_list() {
-            const request = new XMLHttpRequest();
-            request.open('GET', '/api/models', false);
-            request.send();
-            if (request.status === 200) {
-                let entity_list = document.getElementById('list_entity');
-                entity_list.innerText = '';
-                let json = JSON.parse(request.response).json_list;
-                for (let i in json) {
-                    let u_list = document.createElement('ul');
-                    u_list.className = "nav navbar-nav";
-                    let list_item = document.createElement('li');
-                    let a = document.createElement('a');
-                    a.href = `/sql_decrypter/${json[i]}`;
-                    a.textContent = capitalize(json[i]);
-
-                    list_item.appendChild(a);
-                    u_list.appendChild(list_item);
-                    entity_list.appendChild(u_list);
-                }
-                let u_list = document.createElement('ul');
-                u_list.className = "nav navbar-nav";
-                let list_item = document.createElement('li');
-                let a = document.createElement('a');
-                a.href = `/sql_decrypter/add_new_table`;
-                a.textContent = 'New table';
-
-                list_item.appendChild(a);
-                u_list.appendChild(list_item);
-                entity_list.appendChild(u_list);
-            }
-        }
-
-        function capitalize(s) {
-            let buf_list = s.split('_')
-            if (buf_list.length === 1) {
-                buf_list = s.split(/(?=[A-Z])/).map(x => x.toLowerCase())
-            }
-            s = buf_list.join(' ').trim()
-            return s[0].toUpperCase() + s.slice(1);
-        }
-    </script>
+    <script src="../../../static/scripts/base.js"></script>
 {% endblock %}
 
 {% block content %}
