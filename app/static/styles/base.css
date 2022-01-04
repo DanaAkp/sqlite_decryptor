@@ -31,9 +31,9 @@
 .sidepanel .closebtn {
     position: absolute;
     top: 0;
-    /*{#left: 5px;#} */
+    /*left: 5px;*/
     font-size: 36px;
-    /*{#margin-left: 5px;#}*/
+    margin-left: 70%;
 }
 
 /* Стиль кнопка, которая используется для открытия боковой панели */

@@ -5,3 +5,11 @@
     width: 30px;
     height: 30px;
 }
+
+.btn_cancel {
+    background-image: url('https://img.icons8.com/ios/50/000000/undo.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 30px;
+    height: 30px;
+}

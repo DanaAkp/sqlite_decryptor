@@ -85,3 +85,72 @@ function clear_current_db_file() {
 function closeNav() {
     document.getElementById("mySidepanel").style.width = "0";
 }
+
+
+function head3(content, name) {
+    let head3 = document.createElement('H3')
+    head3.textContent = name
+    content.appendChild(head3)
+    content.appendChild(document.createElement('br'))
+}
+
+
+function checked_sqlite() {
+    if (document.getElementById('xxx').checked) {
+        document.getElementById('totalCost').value = 10;
+    }
+    else {
+
+    }
+}
+
+
+function encrypt_nav() {
+    closeNav()
+    let content = document.getElementById('id-page-content')
+    content.innerHTML = ''
+
+    head3(content, 'Upload database for encrypt')
+
+    let lbl_switch = document.createElement('label')
+    lbl_switch.class = "switch"
+
+    let input_sqlite = document.createElement('input')
+    input_sqlite.type = 'checkbox'
+    input_sqlite.onclick = checked_sqlite
+    lbl_switch.appendChild(input_sqlite)
+
+    let span = document.createElement('span')
+    span.class = "slider round"
+    lbl_switch.appendChild(span)
+
+    content.appendChild(lbl_switch)
+
+}
+
+
+function decrypt_nav() {
+    closeNav()
+    let content = document.getElementById('id-page-content')
+    content.innerHTML = ''
+
+    head3(content, 'Upload database encrypted file')
+
+    let input_file = document.createElement('input')
+    input_file.type = 'file'
+    input_file.id = 'encrypted-file-db'
+    input_file.className = "input-file"
+    content.appendChild(input_file)
+
+    let input_text = document.createElement('input')
+    input_text.type = "password"
+    input_text.id = "password-for-decrypt-file"
+    input_text.placeholder = "Enter password"
+    content.appendChild(input_text)
+
+    let btn = document.createElement('input')
+    btn.type = "button"
+    btn.id = "button-upload"
+    btn.value = "Upload file"
+    content.appendChild(btn)
+}
