@@ -110,10 +110,16 @@ function encrypt_nav() {
     let content = document.getElementById('id-page-content')
     content.innerHTML = ''
 
+    let link_css = document.createElement('link')
+    link_css.href = "../../static/styles/home.css"
+    link_css.rel = "stylesheet"
+    link_css.type="text/css"
+    content.appendChild(link_css)
+
     head3(content, 'Upload database for encrypt')
 
     let lbl_switch = document.createElement('label')
-    lbl_switch.class = "switch"
+    lbl_switch.className = "switch"
 
     let input_sqlite = document.createElement('input')
     input_sqlite.type = 'checkbox'
@@ -121,7 +127,7 @@ function encrypt_nav() {
     lbl_switch.appendChild(input_sqlite)
 
     let span = document.createElement('span')
-    span.class = "slider round"
+    span.className = "slider round"
     lbl_switch.appendChild(span)
 
     content.appendChild(lbl_switch)
