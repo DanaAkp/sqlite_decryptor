@@ -1,3 +1,5 @@
+let div_f = document.createElement('div')
+div_f.id = 'id-div-field'
 fill_entity_list();
 
 function fill_entity_list() {
@@ -95,12 +97,69 @@ function head3(content, name) {
 }
 
 
-function checked_sqlite() {
-    if (document.getElementById('xxx').checked) {
-        document.getElementById('totalCost').value = 10;
-    }
-    else {
+function input_password(content) {
+    let input_password = document.createElement('input')
+    input_password.type = 'password'
+    input_password.id = "password-for-encrypt-file"
+    input_password.placeholder = "Enter password"
+    input_password.className = 'form-control'
+    content.appendChild(input_password)
+}
 
+
+function fill_encrypt_sqlite_db() {
+    let host = document.createElement('input')
+    host.type = 'text'
+    host.id = "id-input-host"
+    host.className = 'form-control'
+    host.placeholder = "Enter host"
+    div_f.appendChild(host)
+    div_f.appendChild(document.createElement('br'))
+
+    let port = document.createElement('input')
+    port.type = 'text'
+    port.id = "id-input-port"
+    port.className = 'form-control'
+    port.placeholder = "Enter port"
+    div_f.appendChild(port)
+    div_f.appendChild(document.createElement('br'))
+
+    let username = document.createElement('input')
+    username.type = 'text'
+    username.id = "id-input-username"
+    username.className = 'form-control'
+    username.placeholder = "Enter username"
+    div_f.appendChild(username)
+    div_f.appendChild(document.createElement('br'))
+
+    input_password(div_f)
+    div_f.appendChild(document.createElement('br'))
+
+    let btn = document.createElement('input')
+    btn.type = "button"
+    btn.id = "button-encrypt-postgresql"
+    btn.value = "Encrypt"
+    btn.className = 'btn btn-default'
+    div_f.appendChild(btn)
+}
+
+
+function checked_sqlite() {
+    div_f.innerHTML = ''
+    if (document.getElementById('id-checkbox').checked) {
+        fill_file(div_f, "unencrypted-database-file")
+
+        input_password(div_f)
+        div_f.appendChild(document.createElement('br'))
+
+        let btn = document.createElement('input')
+        btn.type = "button"
+        btn.id = "button-encrypt-sql"
+        btn.value = "Encrypt"
+        btn.className = 'btn btn-default'
+        div_f.appendChild(btn)
+    } else {
+        fill_encrypt_sqlite_db()
     }
 }
 
@@ -113,7 +172,7 @@ function encrypt_nav() {
     let link_css = document.createElement('link')
     link_css.href = "../../static/styles/home.css"
     link_css.rel = "stylesheet"
-    link_css.type="text/css"
+    link_css.type = "text/css"
     content.appendChild(link_css)
 
     head3(content, 'Upload database for encrypt')
@@ -123,6 +182,7 @@ function encrypt_nav() {
 
     let input_sqlite = document.createElement('input')
     input_sqlite.type = 'checkbox'
+    input_sqlite.id = 'id-checkbox'
     input_sqlite.onclick = checked_sqlite
     lbl_switch.appendChild(input_sqlite)
 
@@ -130,8 +190,42 @@ function encrypt_nav() {
     span.className = "slider round"
     lbl_switch.appendChild(span)
 
-    content.appendChild(lbl_switch)
+    let lbl_sqlite = document.createElement('label')
+    lbl_sqlite.textContent = 'SQLite'
+    lbl_sqlite.style.marginLeft = '15px'
+    lbl_sqlite.style.fontSize = '15px'
 
+    let lbl_postgresql = document.createElement('label')
+    lbl_postgresql.textContent = 'PostgreSQL'
+    lbl_postgresql.style.marginRight = '15px'
+    lbl_postgresql.style.fontSize = '15px'
+
+    content.appendChild(lbl_postgresql)
+    content.appendChild(lbl_switch)
+    content.appendChild(lbl_sqlite)
+
+    content.appendChild(div_f)
+
+    fill_encrypt_sqlite_db()
+}
+
+
+function fill_file(content, id_input) {
+    let div = document.createElement('div')
+    div.className = 'custom-file'
+
+    let lbl = document.createElement('label')
+    lbl.className = "custom-file-label"
+    lbl.textContent = "Choose file"
+    div.appendChild(lbl)
+
+    let input_file = document.createElement('input')
+    input_file.type = "file"
+    input_file.className = "custom-file-input"
+    input_file.id = id_input
+    div.appendChild(input_file)
+
+    content.appendChild(div)
 }
 
 
@@ -142,21 +236,20 @@ function decrypt_nav() {
 
     head3(content, 'Upload database encrypted file')
 
-    let input_file = document.createElement('input')
-    input_file.type = 'file'
-    input_file.id = 'encrypted-file-db'
-    input_file.className = "input-file"
-    content.appendChild(input_file)
+    fill_file(content, 'encrypted-file-db')
 
     let input_text = document.createElement('input')
     input_text.type = "password"
     input_text.id = "password-for-decrypt-file"
+    input_text.className = 'form-control'
     input_text.placeholder = "Enter password"
     content.appendChild(input_text)
+    content.appendChild(document.createElement('br'))
 
     let btn = document.createElement('input')
     btn.type = "button"
     btn.id = "button-upload"
     btn.value = "Upload file"
+    btn.className = 'btn btn-default'
     content.appendChild(btn)
 }
