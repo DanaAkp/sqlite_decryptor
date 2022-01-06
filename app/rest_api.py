@@ -3,6 +3,7 @@ from flask_restx import Resource
 
 from app.app import api, db_info
 from app.aes.aes import AES
+from app.connect_to_db import connect_to_db_postgresql, move_db
 from app.utils import check_body_request, serializer
 
 
@@ -126,17 +127,35 @@ class SQLDecrypter(Resource):
         return {'result': True}
 
 
-@api.route('/sql_encryptor')
+@api.route('/sql_encryptor/<string:name_db>')
 class SQLEncryptor(Resource):
-    def post(self):
+    def post(self, name_db):
         """Шифрует чистый (незашифрованный) файл SQLite базы данных и возвращает массив байт зашифрованного файла."""
-        check_body_request(['database_file', 'password'])
-        try:
-            aes = AES(request.json['password'].encode('utf-8'))
-            encrypted_file = aes.encrypt(bytes.fromhex(request.json['database_file']))
-            return {'encrypted_file': encrypted_file.hex()}
-        except Exception as ex:
-            abort(400, ex.args[0])
+        if name_db == 'postgresql':
+            check_body_request(['host', 'port', 'db_password', 'db_name', 'username', 'password'])
+            engine = connect_to_db_postgresql(
+                username=request.json['username'],
+                port=request.json['port'],
+                db_name=request.json['db_name'],
+                host=request.json['host'],
+                password=request.json['db_password']
+            )
+            filename = move_db(engine)
+            with open(filename, 'rb') as file:
+                try:
+                    aes = AES(request.json['password'].encode('utf-8'))
+                    encrypted_file = aes.encrypt(file)
+                    return {'encrypted_file': encrypted_file.hex()}
+                except Exception as error:
+                    print(error)
+        else:
+            check_body_request(['database_file', 'password'])
+            try:
+                aes = AES(request.json['password'].encode('utf-8'))
+                encrypted_file = aes.encrypt(bytes.fromhex(request.json['database_file']))
+                return {'encrypted_file': encrypted_file.hex()}
+            except Exception as ex:
+                abort(400, ex.args[0])
 
 
 @api.route('/columns/<string:table_name>', methods=['POST'])

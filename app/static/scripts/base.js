@@ -107,7 +107,7 @@ function input_password(content) {
 }
 
 
-function fill_encrypt_sqlite_db() {
+function fill_encrypt_postgresql_db() {
     let host = document.createElement('input')
     host.type = 'text'
     host.id = "id-input-host"
@@ -124,12 +124,28 @@ function fill_encrypt_sqlite_db() {
     div_f.appendChild(port)
     div_f.appendChild(document.createElement('br'))
 
+    let db_name = document.createElement('input')
+    db_name.type = 'text'
+    db_name.id = 'id-input-db-name'
+    db_name.className = 'form-control'
+    db_name.placeholder = "Enter database name"
+    div_f.appendChild(db_name)
+    div_f.appendChild(document.createElement('br'))
+
     let username = document.createElement('input')
     username.type = 'text'
     username.id = "id-input-username"
     username.className = 'form-control'
     username.placeholder = "Enter username"
     div_f.appendChild(username)
+    div_f.appendChild(document.createElement('br'))
+
+    let db_password = document.createElement('input')
+    db_password.type = 'text'
+    db_password.id = "id-input-db-password"
+    db_password.className = 'form-control'
+    db_password.placeholder = "Enter database password"
+    div_f.appendChild(db_password)
     div_f.appendChild(document.createElement('br'))
 
     input_password(div_f)
@@ -147,7 +163,7 @@ function fill_encrypt_sqlite_db() {
 function checked_sqlite() {
     div_f.innerHTML = ''
     if (document.getElementById('id-checkbox').checked) {
-        fill_file(div_f, "unencrypted-database-file")
+        fill_file(div_f, "unencrypted-database-file-sql")
 
         input_password(div_f)
         div_f.appendChild(document.createElement('br'))
@@ -159,7 +175,7 @@ function checked_sqlite() {
         btn.className = 'btn btn-default'
         div_f.appendChild(btn)
     } else {
-        fill_encrypt_sqlite_db()
+        fill_encrypt_postgresql_db()
     }
 }
 
@@ -200,7 +216,7 @@ function encrypt_nav() {
 
     content.appendChild(div_f)
 
-    fill_encrypt_sqlite_db()
+    fill_encrypt_postgresql_db()
 }
 
 
