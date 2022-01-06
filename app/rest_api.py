@@ -12,7 +12,7 @@ class ModelsController(Resource):
     def get(self):
         """Возвращает список сущностей базы данных."""
         if db_info.db is None:
-            abort(500, 'Database file does not uploaded yet.')
+            abort(400, 'Database file does not uploaded yet.')
         return jsonify(json_list=db_info.get_tables())
 
     def post(self):

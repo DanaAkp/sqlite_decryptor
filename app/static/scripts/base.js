@@ -169,12 +169,6 @@ function encrypt_nav() {
     let content = document.getElementById('id-page-content')
     content.innerHTML = ''
 
-    let link_css = document.createElement('link')
-    link_css.href = "../../static/styles/home.css"
-    link_css.rel = "stylesheet"
-    link_css.type = "text/css"
-    content.appendChild(link_css)
-
     head3(content, 'Upload database for encrypt')
 
     let lbl_switch = document.createElement('label')
@@ -211,21 +205,22 @@ function encrypt_nav() {
 
 
 function fill_file(content, id_input) {
-    let div = document.createElement('div')
-    div.className = 'custom-file'
+    let div_group = document.createElement('div')
+    div_group.className = 'form-control'
 
     let lbl = document.createElement('label')
-    lbl.className = "custom-file-label"
+    lbl.className = "form-label"
     lbl.textContent = "Choose file"
-    div.appendChild(lbl)
+    div_group.appendChild(lbl)
 
     let input_file = document.createElement('input')
     input_file.type = "file"
-    input_file.className = "custom-file-input"
+    input_file.className = "form-control"
     input_file.id = id_input
-    div.appendChild(input_file)
+    lbl.appendChild(input_file)
 
-    content.appendChild(div)
+    content.appendChild(div_group)
+    content.appendChild(document.createElement('br'))
 }
 
 
