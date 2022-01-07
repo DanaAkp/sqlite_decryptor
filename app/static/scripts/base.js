@@ -184,6 +184,7 @@ function encrypt_nav() {
     closeNav()
     let content = document.getElementById('id-page-content')
     content.innerHTML = ''
+    div_f.innerHTML = ''
 
     head3(content, 'Upload database for encrypt')
 

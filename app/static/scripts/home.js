@@ -1,3 +1,4 @@
+encrypt_nav()
 let input_encrypted_file_db = document.getElementById('encrypted-file-db');
 let password_for_decrypt = document.getElementById('password-for-decrypt-file');
 input_encrypted_file_db.onchange = e => {
