@@ -172,7 +172,7 @@ function fill_encrypt_postgresql_db() {
         let arr = new Uint8Array(cont);
         let hex = to_hex_string(arr);
         const request = new XMLHttpRequest();
-        request.open('POST', '/api/sql_encryptor', true);
+        request.open('POST', '/api/sql_encryptor/postgresql', true);
         request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
         request.send(JSON.stringify({
             'database_file': hex,
@@ -253,7 +253,7 @@ function checked_sqlite() {
                     let arr = new Uint8Array(cont);
                     let hex = to_hex_string(arr);
                     const request = new XMLHttpRequest();
-                    request.open('POST', '/api/sql_encryptor', true);
+                    request.open('POST', '/api/sql_encryptor/sqlite', true);
                     request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
                     request.send(JSON.stringify({
                         'database_file': hex,
