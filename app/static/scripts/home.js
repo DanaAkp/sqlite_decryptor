@@ -122,11 +122,3 @@ function to_hex_string(byte_array) {
         return ('0' + (byte & 0xFF).toString(16)).slice(-2);
     }).join('');
 }
-
-
-let input_new_db_name = document.getElementById('input-new-database-name')
-input_new_db_name.onchange = e => {
-    document.getElementById('button-create-new-database').onclick = () => {
-
-    }
-}
