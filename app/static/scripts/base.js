@@ -154,13 +154,63 @@ function fill_encrypt_postgresql_db() {
     btn.value = "Encrypt"
     btn.className = 'btn btn-default'
     div_f.appendChild(btn)
+
+
+    btn.onclick = () => {
+        let host = document.getElementById("id-input-host")
+        let port = document.getElementById("id-input-port")
+        let username = document.getElementById("id-input-username")
+        let db_password = document.getElementById("id-input-db-password")
+        let db_name = document.getElementById("id-input-db-name")
+        let cont = JSON.stringify({
+            'host': host.value,
+            'port': port.value,
+            'username': username.value,
+            'db_password': db_password.value,
+            'db_name': db_name.value
+        })
+        let arr = new Uint8Array(cont);
+        let hex = to_hex_string(arr);
+        const request = new XMLHttpRequest();
+        request.open('POST', '/api/sql_encryptor', true);
+        request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        request.send(JSON.stringify({
+            'database_file': hex,
+            'password': input_password.value
+        }));
+
+        request.onreadystatechange = function () {
+            if (request.readyState === 4) {
+                let response = JSON.parse(request.response);
+                if (response.message === undefined) {
+                    let textData = JSON.parse(request.response).encrypted_file;
+                    let blobData = new Blob([textData], {type: "text/plain"});
+                    let url = window.URL.createObjectURL(blobData);
+                    save_file('example.txt', url);
+
+                    input_password.value = '';
+                    host.value = '';
+                    port.value = '';
+                    db_name.value = '';
+                    db_password.value = '';
+                    username.value = '';
+                } else alert(response.message);
+            }
+        }
+    }
+}
+
+
+function to_hex_string(byte_array) {
+    return Array.prototype.map.call(byte_array, function (byte) {
+        return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+    }).join('');
 }
 
 
 function checked_sqlite() {
     div_f.innerHTML = ''
     if (document.getElementById('id-checkbox').checked) {
-
         let div_group = document.createElement('div')
         div_group.className = 'form-control'
 
@@ -191,6 +241,43 @@ function checked_sqlite() {
         btn.id = "button-encrypt-sql"
         btn.value = "Encrypt"
         btn.className = 'btn btn-default'
+
+
+        input_file.onchange = e => {
+            btn.onclick = () => {
+                let file = e.target.files[0];
+                let reader = new FileReader();
+                reader.readAsArrayBuffer(file);
+                reader.onload = reader_event => {
+                    let cont = reader_event.target.result;
+                    let arr = new Uint8Array(cont);
+                    let hex = to_hex_string(arr);
+                    const request = new XMLHttpRequest();
+                    request.open('POST', '/api/sql_encryptor', true);
+                    request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+                    request.send(JSON.stringify({
+                        'database_file': hex,
+                        'password': input_password.value
+                    }));
+
+                    request.onreadystatechange = function () {
+                        if (request.readyState === 4) {
+                            let response = JSON.parse(request.response);
+                            if (response.message === undefined) {
+                                let textData = JSON.parse(request.response).encrypted_file;
+                                let blobData = new Blob([textData], {type: "text/plain"});
+                                let url = window.URL.createObjectURL(blobData);
+                                save_file('example.txt', url);
+
+                                input_password.value = '1234567890123456';
+                                input_file.value = '';
+                            } else alert(response.message);
+                        }
+                    }
+                }
+            }
+        }
+
         div_f.appendChild(btn)
     } else {
         fill_encrypt_postgresql_db()
@@ -276,5 +363,38 @@ function decrypt_nav() {
     btn.id = "button-upload"
     btn.value = "Upload file"
     btn.className = 'btn btn-default'
+
+
+    input_file.onchange = e => {
+        btn.onclick = () => {
+            let file = e.target.files[0];
+            let reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = reader_event => {
+                let content = reader_event.target.result;
+                const request = new XMLHttpRequest();
+                request.open('POST', '/api/sql_decrypter', true);
+                request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+                let json = JSON.stringify({
+                    database_file: content,
+                    password: input_text.value
+                });
+                console.log(input_text.value);
+                console.log(json);
+                request.send(json);
+                request.onreadystatechange = function () {
+                    if (request.readyState === 4) {
+                        let response = JSON.parse(request.response);
+                        if (response.result === true) {
+                            fill_entity_list();
+                            input_text.value = '1234567890123456';
+                            input_file.value = '';
+                        } else alert(response.message);
+                    }
+                }
+            }
+        }
+    }
+
     content.appendChild(btn)
 }
