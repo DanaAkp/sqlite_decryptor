@@ -97,16 +97,6 @@ function head3(content, name) {
 }
 
 
-function input_password(content) {
-    let input_password = document.createElement('input')
-    input_password.type = 'password'
-    input_password.id = "password-for-encrypt-file"
-    input_password.placeholder = "Enter password"
-    input_password.className = 'form-control'
-    content.appendChild(input_password)
-}
-
-
 function fill_encrypt_postgresql_db() {
     let host = document.createElement('input')
     host.type = 'text'
@@ -148,7 +138,14 @@ function fill_encrypt_postgresql_db() {
     div_f.appendChild(db_password)
     div_f.appendChild(document.createElement('br'))
 
-    input_password(div_f)
+
+    let input_password = document.createElement('input')
+    input_password.type = 'password'
+    input_password.id = "password-for-encrypt-file"
+    input_password.placeholder = "Enter password"
+    input_password.className = 'form-control'
+    div_f.appendChild(input_password)
+
     div_f.appendChild(document.createElement('br'))
 
     let btn = document.createElement('input')
@@ -163,9 +160,30 @@ function fill_encrypt_postgresql_db() {
 function checked_sqlite() {
     div_f.innerHTML = ''
     if (document.getElementById('id-checkbox').checked) {
-        fill_file(div_f, "unencrypted-database-file-sql")
 
-        input_password(div_f)
+        let div_group = document.createElement('div')
+        div_group.className = 'form-control'
+
+        let lbl = document.createElement('label')
+        lbl.className = "form-label"
+        lbl.textContent = "Choose file"
+        div_group.appendChild(lbl)
+
+        let input_file = document.createElement('input')
+        input_file.type = "file"
+        input_file.className = "form-control"
+        input_file.id = "unencrypted-database-file-sql"
+        lbl.appendChild(input_file)
+
+        div_f.appendChild(div_group)
+        div_f.appendChild(document.createElement('br'))
+
+        let input_password = document.createElement('input')
+        input_password.type = 'password'
+        input_password.id = "password-for-encrypt-file"
+        input_password.placeholder = "Enter password"
+        input_password.className = 'form-control'
+        div_f.appendChild(input_password)
         div_f.appendChild(document.createElement('br'))
 
         let btn = document.createElement('input')
@@ -221,7 +239,13 @@ function encrypt_nav() {
 }
 
 
-function fill_file(content, id_input) {
+function decrypt_nav() {
+    closeNav()
+    let content = document.getElementById('id-page-content')
+    content.innerHTML = ''
+
+    head3(content, 'Upload database encrypted file')
+
     let div_group = document.createElement('div')
     div_group.className = 'form-control'
 
@@ -233,22 +257,11 @@ function fill_file(content, id_input) {
     let input_file = document.createElement('input')
     input_file.type = "file"
     input_file.className = "form-control"
-    input_file.id = id_input
+    input_file.id = 'encrypted-file-db'
     lbl.appendChild(input_file)
 
     content.appendChild(div_group)
     content.appendChild(document.createElement('br'))
-}
-
-
-function decrypt_nav() {
-    closeNav()
-    let content = document.getElementById('id-page-content')
-    content.innerHTML = ''
-
-    head3(content, 'Upload database encrypted file')
-
-    fill_file(content, 'encrypted-file-db')
 
     let input_text = document.createElement('input')
     input_text.type = "password"
