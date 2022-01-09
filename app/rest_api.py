@@ -182,4 +182,5 @@ class ColumnsController(Resource):
 class DatabaseController(Resource):
     # todo
     def post(self, database_name):
+        """Создание новой зашифрованной базы данных (мб убрать этот метод)"""
         pass

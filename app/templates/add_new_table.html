@@ -2,11 +2,17 @@
 
 
 {% block page_content %}
+    <style>
+        .input-in-table {
+            {#border: none;#}
+            {#border-color: inherit;#}
+        }
+    </style>
     <h1>Create new entity</h1>
     <br>
-    <p><input type="text" id="new-table-name" placeholder="Enter new table name"></p>
+    <p><input type="text" class="form-control" id="new-table-name" placeholder="Enter new table name"></p>
     <div id="input-columns">
-        <table id="columns" class="table table-hover">
+        <table id="columns" >
             <thead>
             <th>name</th>
             <th>type</th>
@@ -15,10 +21,10 @@
             </thead>
             <tbody id="tbody-columns">
             <tr>
-                <td><input type="text"></td>
-                <td><input type="text"></td>
-                <td><input type="text"></td>
-                <td><input type="text"></td>
+                <td><input class="form-control" type="text"></td>
+                <td><input class="form-control" type="text"></td>
+                <td><input class="form-control" type="text"></td>
+                <td><input class="form-control" type="text"></td>
             </tr>
             </tbody>
         </table>

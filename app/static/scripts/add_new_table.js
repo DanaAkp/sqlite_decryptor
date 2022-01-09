@@ -23,6 +23,7 @@ function add_column_input() {
     let col_name = document.createElement('td')
     let input_name = document.createElement('input')
     input_name.type = 'text'
+    input_name.className = 'input-in-table'
     col_name.appendChild(input_name)
     row.appendChild(col_name)
 
