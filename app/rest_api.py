@@ -130,7 +130,7 @@ class SQLDecrypter(Resource):
 @api.route('/sql_encryptor/<string:name_db>')
 class SQLEncryptor(Resource):
     def post(self, name_db):
-        """Шифрует чистый (незашифрованный) файл SQLite базы данных и возвращает массив байт зашифрованного файла."""
+        """Шифрует чистый (незашифрованный) файл базы данных и возвращает массив байт зашифрованного файла."""
         if name_db == 'postgresql':
             check_body_request(['host', 'port', 'db_password', 'db_name', 'username', 'password'])
             engine = connect_to_db_postgresql(
