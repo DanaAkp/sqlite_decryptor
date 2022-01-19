@@ -1,4 +1,5 @@
 function add_new_table() {
+    let table_name = document.getElementById('new-table-name')
     let tbody = document.getElementById('tbody-columns')
     let rows = tbody.children
     let columns = []
@@ -17,7 +18,20 @@ function add_new_table() {
     const request = new XMLHttpRequest();
     request.open('POST', `/api/models`, true);
     request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-    request.send(JSON.stringify(columns));
+    let json = {
+        'columns': columns,
+        'table_name': table_name.value
+    }
+    console.log(json)
+    request.send(JSON.stringify(json));
+    request.onreadystatechange = function () {
+        if (request.readyState === 4) {
+            console.log(request.response);
+            if (request.status === 200) {
+                window.location.href = `/sql_decrypter/${table_name.value}`;
+            } else alert(JSON.parse(request.response).message);
+        }
+    }
 }
 
 function add_column_input() {

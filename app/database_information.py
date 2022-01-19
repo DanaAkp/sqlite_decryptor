@@ -106,6 +106,7 @@ class DatabaseInformation:
                          primary_key=i.get('primary_key'), nullable=i.get('nullable'))
             new_table.append_column(col)
         new_table.create(bind=self.db)
+        self.Base.prepare()
 
     def delete_table(self, table_name: str):
         table = self.Base.metadata.tables.get(table_name)

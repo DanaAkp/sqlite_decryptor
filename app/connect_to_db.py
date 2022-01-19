@@ -2,8 +2,6 @@ from sqlalchemy import Table, inspect, create_engine
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from app.database_information import DatabaseInformation
-
 
 def move_table(table, source_meta, dest_meta, source, destination):
     # declare tables
