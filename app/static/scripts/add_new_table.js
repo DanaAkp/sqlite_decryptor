@@ -9,8 +9,8 @@ function add_new_table() {
         let col = {
             'column_name': inputs[0].children[0].value,
             'column_type': inputs[1].children[0].value,
-            'primary_key': inputs[2].children[0].value,
-            'nullable': inputs[3].children[0].value
+            'primary_key': inputs[2].children[0].checked,
+            'nullable': inputs[3].children[0].checked
         }
         columns.push(col)
     }
@@ -54,14 +54,15 @@ function add_column_input() {
 
     let col_pk = document.createElement('td')
     let input_pk = document.createElement('input')
-    input_pk.className = 'form-control'
+    input_pk.className = 'my_checkbox'
+    input_pk.type = 'checkbox'
     col_pk.appendChild(input_pk)
     row.appendChild(col_pk)
 
     let col_nullable = document.createElement('td')
     let input_nullable = document.createElement('input')
-    input_nullable.type = 'text'
-    input_nullable.className = 'form-control'
+    input_nullable.type = 'checkbox'
+    input_nullable.className = 'my_checkbox'
     col_nullable.appendChild(input_nullable)
     row.appendChild(col_nullable)
 

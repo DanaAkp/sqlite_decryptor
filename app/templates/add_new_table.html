@@ -3,30 +3,42 @@
 
 {% block page_content %}
     <h1>Create new entity</h1>
+    <link href="../../../static/styles/add_new_table.css" rel="stylesheet">
     <br>
     <p><input type="text" class="form-control" id="new-table-name" placeholder="Enter new table name"></p>
     <div id="input-columns">
-        <table id="columns" >
+        <table id="columns" class="my_table">
             <thead>
-            <th>name</th>
-            <th>type</th>
-            <th>primary key</th>
-            <th>nullable</th>
+            <th class="my_th">Name</th>
+            <th class="my_th">Type</th>
+            <th class="my_th">Primary key</th>
+            <th class="my_th">Nullable</th>
             </thead>
             <tbody id="tbody-columns">
             <tr>
                 <td><input class="form-control" type="text"></td>
-                <td><input class="form-control" type="text"></td>
-                <td><input class="form-control" type="text"></td>
-                <td><input class="form-control" type="text"></td>
+                <td>
+                    <input class="form-control" type="text" name="example" list="exampleList">
+                    <datalist id="exampleList">
+                        <option value="int">
+                        <option value="str">
+                        <option value="date">
+                        <option value="date_time">
+                        <option value="bool">
+                        <option value="bin">
+                        <option value="text">
+                    </datalist>
+                </td>
+                <td><input class="my_checkbox" type="checkbox" checked></td>
+                <td><input class="my_checkbox" type="checkbox"></td>
             </tr>
             </tbody>
         </table>
     </div>
-    <p><input type="button" value="add column" onclick="add_column_input()"></p>
     <br>
     <p>
-        <input type="button" onclick="add_new_table()" value="add new table">
+        <input type="button" class="btn_create" onclick="add_column_input()">
+        <input type="button" class="btn_new_table" onclick="add_new_table()">
     </p>
 
     <script src="../static/scripts/add_new_table.js">
