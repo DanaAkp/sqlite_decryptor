@@ -78,7 +78,7 @@ function clear_current_db_file() {
     request.open('DELETE', '/api/sql_decrypter', false);
     request.send();
     if (request.status === 200) {
-        window.location.reload();
+        window.location.href = '/'
         alert('The current database file has been cleaned up successfully.')
     }
 }
@@ -131,7 +131,7 @@ function fill_encrypt_postgresql_db() {
     div_f.appendChild(document.createElement('br'))
 
     let db_password = document.createElement('input')
-    db_password.type = 'text'
+    db_password.type = 'password'
     db_password.id = "id-input-db-password"
     db_password.className = 'form-control'
     db_password.placeholder = "Enter database password"
@@ -157,27 +157,28 @@ function fill_encrypt_postgresql_db() {
 
 
     btn.onclick = () => {
-        let host = document.getElementById("id-input-host")
-        let port = document.getElementById("id-input-port")
-        let username = document.getElementById("id-input-username")
-        let db_password = document.getElementById("id-input-db-password")
-        let db_name = document.getElementById("id-input-db-name")
-        let cont = JSON.stringify({
-            'host': host.value,
-            'port': port.value,
-            'username': username.value,
-            'db_password': db_password.value,
-            'db_name': db_name.value
-        })
-        let arr = new Uint8Array(cont);
-        let hex = to_hex_string(arr);
+        // let host = document.getElementById("id-input-host")
+        // let port = document.getElementById("id-input-port")
+        // let username = document.getElementById("id-input-username")
+        // let db_password = document.getElementById("id-input-db-password")
+        // let db_name = document.getElementById("id-input-db-name")
+        // let cont = JSON.stringify({
+        //
+        // })
+        // let arr = new Uint8Array(cont);
+        // let hex = to_hex_string(arr);
         const request = new XMLHttpRequest();
         request.open('POST', '/api/sql_encryptor/postgresql', true);
         request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
         request.send(JSON.stringify({
-            'database_file': hex,
+            'host': host.value,
+            'port': port.value,
+            'username': username.value,
+            'db_password': db_password.value,
+            'db_name': db_name.value,
             'password': input_password.value
         }));
+        console.log(db_password.value)
 
         request.onreadystatechange = function () {
             if (request.readyState === 4) {

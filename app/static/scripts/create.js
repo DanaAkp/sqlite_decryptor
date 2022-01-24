@@ -1,5 +1,5 @@
 let header = document.getElementById('header-id')
-header.textContent = 'Create' + capitalize(header.textContent)
+header.textContent = 'Create ' + capitalize(header.textContent)
 let entity_name = document.getElementById('entity_name').dataset.geocode;
 let input_attributes = document.getElementById('input-attributes');
 const request = new XMLHttpRequest();

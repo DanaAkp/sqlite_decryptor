@@ -17,6 +17,7 @@ function create_table() {
     for (let i in json) {
         let th = document.createElement('th');
         th.textContent = capitalize(json[i]);
+        th.className = "my_th"
         t_head.appendChild(th);
     }
     table.appendChild(t_head);
@@ -30,6 +31,7 @@ function create_table() {
         for (let j in json[i]) {
             let td = document.createElement('td');
             td.textContent = json[i][j];
+            td.className = "my_td";
             row.appendChild(td);
         }
         const request_primary_key = new XMLHttpRequest();

@@ -144,7 +144,7 @@ class SQLEncryptor(Resource):
             with open(filename, 'rb') as file:
                 try:
                     aes = AES(request.json['password'].encode('utf-8'))
-                    encrypted_file = aes.encrypt(file)
+                    encrypted_file = aes.encrypt(file.read())
                     return {'encrypted_file': encrypted_file.hex()}
                 except Exception as error:
                     print(error)
